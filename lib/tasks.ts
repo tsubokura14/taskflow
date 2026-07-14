@@ -87,7 +87,6 @@ export async function updateTask(
             version: currentVersion + 1,
         })
         .eq("id", id)
-        // .eq("version", currentVersion)  // 楽観的排他制御
         .select() // updateした行をそのまま返却させる。
         .single(); // 返却する形式に単一オブジェクト{...}を指定する。
 

@@ -181,7 +181,6 @@ export function KanbanBoard() {
         const newStatus = resolveNewStatus(String(over.id), tasks);
 
         if (newStatus && newStatus !== activeTask.status) {
-            // 未理解
             moveTaskStatus(activeTask.id, newStatus);
         }
     }
