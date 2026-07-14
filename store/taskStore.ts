@@ -10,7 +10,7 @@ type TaskStore = {
     editTask: (
         id: string,
         change: Partial<Pick<Task, "title" | "status" | "priority">>
-    ) => Promise<boolean>;
+    ) => Promise<Error | null>;
     removeTask: (id: string) => Promise<void>;
     // ドラッグ中の見た目のカラム移動専用。supabaseへは送らない
     moveTaskStatus: (id: string, status: TaskStatus) => void;
@@ -21,6 +21,10 @@ type TaskStore = {
     openCreateForm: () => void;
     openEditForm: (taskId: string) => void;
     closeForm: () => void;
+    isToastDisplay: boolean,
+    toastText: string;
+    openToast: (toastText: string) => void;
+    closeToast: () => void;
 };
 
 /**
@@ -68,7 +72,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
     editTask: async (id, change) => {
         const current = get().tasks.find((task) => task.id === id);
-        if (!current) return false;
+        if (!current) return new Error("不明なエラー");
         try {
             // 楽観的排他制御を行うため、現在のバージョンを引き渡す
             const update = await taskApi.updateTask(id, change, current.version);
@@ -78,14 +82,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         } catch (error) {
             if (error instanceof taskApi.TaskConflictError) {
                 console.error(`${error.name}: ${error.message}`);
+                return error;
             } else if (error instanceof taskApi.TaskNotFoundError) {
                 console.error(`${error.name}: ${error.message}`);
+                return error;
             } else {
                 console.error("タスクの更新に失敗しました", error);
             }
-            return false;
+            return new Error("不明なエラー");
         }
-        return true;
+        return null;
     },
 
     removeTask: async (id) => {
@@ -119,4 +125,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     closeForm: () => {
         set({ isFormOpen: false, editingTaskId: null });
     },
+
+    isToastDisplay: false,
+    toastText: "",
+
+    openToast: (toastText: string) => {
+        set({ isToastDisplay: true, toastText });
+    },
+
+    closeToast: () => {
+        set({ isToastDisplay: false, toastText: "" });
+    }
+
 }));

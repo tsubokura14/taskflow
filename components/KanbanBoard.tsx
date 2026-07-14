@@ -13,6 +13,7 @@ import {
     useSensors
 } from "@dnd-kit/core";
 import { useTaskStore } from "@/store/taskStore";
+import { Toast } from "./Toast";
 import { Task, TaskStatus } from "@/types/task";
 import { TaskCard } from "./TaskCard";
 import { TaskForm } from "./TaskForm";
@@ -124,6 +125,7 @@ export function KanbanBoard() {
     const openCreateForm = useTaskStore((state) => state.openCreateForm);
     const editTask = useTaskStore((state) => state.editTask);
     const moveTaskStatus = useTaskStore((state) => state.moveTaskStatus);
+    const openToast = useTaskStore((state) => state.openToast);
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -206,9 +208,13 @@ export function KanbanBoard() {
         // ドラッグ開始時のステータスとドロップ時のステータスが異なる場合
         if (newStatus && startedFrom && newStatus !== startedFrom) {
             // ドラッグ&ドロップした要素のステータスを変更
-            const result: boolean = await editTask(activeTask.id, { status: newStatus });
-            // 更新に失敗した場合、ドラッグ開始時に戻す
-            if (!result) moveTaskStatus(activeTask.id, startedFrom);
+            const result: Error | null = await editTask(activeTask.id, { status: newStatus });
+            // 更新に失敗した場合
+            if (result) {
+                // 最新のデータを反映
+                await fetchTasks();
+                openToast(result.message);
+            }
         }
 
         dragStartStatusRef.current = null;
@@ -216,6 +222,8 @@ export function KanbanBoard() {
 
     return (
         <div className="p-6">
+            <Toast />
+
             {canCreateTask() && (
                 <button
                     onClick={openCreateForm}

@@ -8,9 +8,11 @@ export function TaskForm() {
     const isFormOpen = useTaskStore((state) => state.isFormOpen);
     const editingTaskId = useTaskStore((state) => state.editingTaskId);
     const tasks = useTaskStore((state) => state.tasks);
+    const fetchTasks = useTaskStore((state) => state.fetchTasks);
     const addTask = useTaskStore((state) => state.addTask);
     const editTask = useTaskStore((state) => state.editTask);
     const closeForm = useTaskStore((state) => state.closeForm);
+    const openToast = useTaskStore((state) => state.openToast);
     
     const editingTask = tasks.find((task) => task.id === editingTaskId);
 
@@ -24,9 +26,13 @@ export function TaskForm() {
         if (!title.trim()) return;
 
         if (editingTask) {
-            const result: boolean = await editTask(editingTask.id, { title, priority });
-            // 暫定措置
-            if (!result) console.log("更新失敗");
+            const result: Error | null = await editTask(editingTask.id, { title, priority });
+            // 更新に失敗した場合
+            if (result && result.message) {
+                // 最新のデータを取得
+                await fetchTasks();
+                openToast(result.message);
+            }
         } else {
             addTask({ title, priority });
         }
