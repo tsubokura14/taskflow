@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { useTaskStore } from "@/store/taskStore";
 import { Task } from "@/types/task";
 
@@ -19,12 +19,14 @@ export function TaskForm() {
 
     if (!isFormOpen) return null;
 
-    function handleSubmit(e: FormEvent) {
+    async function handleSubmit(e: FormEvent) {
         e.preventDefault();
         if (!title.trim()) return;
 
         if (editingTask) {
-            editTask(editingTask.id, { title, priority });
+            const result: boolean = await editTask(editingTask.id, { title, priority });
+            // 暫定措置
+            if (!result) console.log("更新失敗");
         } else {
             addTask({ title, priority });
         }

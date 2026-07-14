@@ -40,6 +40,20 @@ function rowToTask(row: TaskRow): Task {
     };
 }
 
+export class TaskConflictError extends Error {
+    constructor() {
+        super("データが更新されているため保存できませんでした。");
+        this.name = "TaskConflictError";
+    }
+}
+
+export class TaskNotFoundError extends Error {
+    constructor() {
+        super("対象のタスクが見つかりませんでした。");
+        this.name = "TaskNotFoundError";
+    }
+ } 
+
 export async function getTasks(): Promise<Task[]> {
     const { data, error } = await supabase
         .from("task")
@@ -87,12 +101,25 @@ export async function updateTask(
             version: currentVersion + 1,
         })
         .eq("id", id)
-        // .eq("version", currentVersion)  // 楽観的排他制御
+        .eq("version", currentVersion)  // 楽観的排他制御
         .select() // updateした行をそのまま返却させる。
-        .single(); // 返却する形式に単一オブジェクト{...}を指定する。
 
     if (error) throw error;
-    return rowToTask(data as TaskRow);
+
+    if (data.length === 0) {
+        // WHEREに一致しなかった理由（競合 or 存在しない）を切り分けるため、
+        // versionの条件を外して存在有無だけ確認する。
+        const { data: existing, error: existError } = await supabase
+            .from("task")
+            .select("id")
+            .eq("id", id)
+            .maybeSingle();
+
+        if (existError) throw existError;
+        throw existing ? new TaskConflictError() : new TaskNotFoundError();
+    }
+
+    return rowToTask(data[0] as TaskRow);
 }
 
 export async function deleteTask(id: string): Promise<void> {
