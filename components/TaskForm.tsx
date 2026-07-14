@@ -14,19 +14,8 @@ export function TaskForm() {
     
     const editingTask = tasks.find((task) => task.id === editingTaskId);
 
-    const [title, setTitle] = useState("");
-    const [priority, setPriority] = useState<Task["priority"]>("medium");
-
-    // フォームの対象（新規 or 編集中のタスク）が変わるたびに、入力欄を対象の内容に更新
-    useEffect(() => {
-        if (editingTask) {
-            setTitle(editingTask.title);
-            setPriority(editingTask.priority);
-        } else {
-            setTitle("");
-            setPriority("medium");
-        }
-    }, [editingTask]);
+    const [title, setTitle] = useState(editingTask?.title ?? "");
+    const [priority, setPriority] = useState<Task["priority"]>(editingTask?.priority ?? "medium");
 
     if (!isFormOpen) return null;
 
