@@ -11,6 +11,7 @@ export function TaskForm() {
     const addTask = useTaskStore((state) => state.addTask);
     const editTask = useTaskStore((state) => state.editTask);
     const closeForm = useTaskStore((state) => state.closeForm);
+    const openToast = useTaskStore((state) => state.openToast);
     
     const editingTask = tasks.find((task) => task.id === editingTaskId);
 
@@ -26,7 +27,7 @@ export function TaskForm() {
         if (editingTask) {
             const result: boolean = await editTask(editingTask.id, { title, priority });
             // 暫定措置
-            if (!result) console.log("更新失敗");
+            if (!result) openToast("直前にデータが更新されています。編集に失敗しました。");
         } else {
             addTask({ title, priority });
         }

@@ -21,6 +21,10 @@ type TaskStore = {
     openCreateForm: () => void;
     openEditForm: (taskId: string) => void;
     closeForm: () => void;
+    isToastDisplay: boolean,
+    toastText: string;
+    openToast: (toastText: string) => void;
+    closeToast: () => void;
 };
 
 /**
@@ -119,4 +123,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     closeForm: () => {
         set({ isFormOpen: false, editingTaskId: null });
     },
+
+    isToastDisplay: false,
+    toastText: "",
+
+    openToast: (toastText: string) => {
+        set({ isToastDisplay: true, toastText });
+    },
+
+    closeToast: () => {
+        set({ isToastDisplay: false, toastText: "" });
+    }
+
 }));

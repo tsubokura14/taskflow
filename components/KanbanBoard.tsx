@@ -13,6 +13,7 @@ import {
     useSensors
 } from "@dnd-kit/core";
 import { useTaskStore } from "@/store/taskStore";
+import { Toast } from "./Toast";
 import { Task, TaskStatus } from "@/types/task";
 import { TaskCard } from "./TaskCard";
 import { TaskForm } from "./TaskForm";
@@ -216,6 +217,8 @@ export function KanbanBoard() {
 
     return (
         <div className="p-6">
+            <Toast />
+
             {canCreateTask() && (
                 <button
                     onClick={openCreateForm}
