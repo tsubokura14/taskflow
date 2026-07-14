@@ -24,8 +24,11 @@ export function Toast() {
     if (!isToastDisplay || toastText === "") return null;
 
     return (
-        <div className="p-6">
-            <p>{toastText}</p>
+        <div className="fixed top-6 left-1/2 z-50 -translate-x-1/2">
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-surface-elevated px-4 py-3 text-sm font-medium text-text shadow-xl">
+                <span className="h-2 w-2 shrink-0 rounded-full bg-danger" />
+                {toastText}
+            </div>
         </div>
     )
 }
