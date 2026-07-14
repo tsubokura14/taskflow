@@ -186,7 +186,7 @@ export function KanbanBoard() {
     }
 
     // ドロップした結果を判定・反映させる。
-    function handleDragEnd(event: DragEndEvent) {
+    async function handleDragEnd(event: DragEndEvent) {
         if (!canEditTask()) return;
 
         // active: ドラッグされていた要素
@@ -206,7 +206,9 @@ export function KanbanBoard() {
         // ドラッグ開始時のステータスとドロップ時のステータスが異なる場合
         if (newStatus && startedFrom && newStatus !== startedFrom) {
             // ドラッグ&ドロップした要素のステータスを変更
-            editTask(activeTask.id, { status: newStatus });
+            const result: boolean = await editTask(activeTask.id, { status: newStatus });
+            // 更新に失敗した場合、ドラッグ開始時に戻す
+            if (!result) moveTaskStatus(activeTask.id, startedFrom);
         }
 
         dragStartStatusRef.current = null;

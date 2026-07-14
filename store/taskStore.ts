@@ -10,7 +10,7 @@ type TaskStore = {
     editTask: (
         id: string,
         change: Partial<Pick<Task, "title" | "status" | "priority">>
-    ) => Promise<void>;
+    ) => Promise<boolean>;
     removeTask: (id: string) => Promise<void>;
     // ドラッグ中の見た目のカラム移動専用。supabaseへは送らない
     moveTaskStatus: (id: string, status: TaskStatus) => void;
@@ -68,7 +68,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
     editTask: async (id, change) => {
         const current = get().tasks.find((task) => task.id === id);
-        if (!current) return;
+        if (!current) return false;
         try {
             // 楽観的排他制御を行うため、現在のバージョンを引き渡す
             const update = await taskApi.updateTask(id, change, current.version);
@@ -76,8 +76,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
                 tasks: state.tasks.map((task) => (task.id === id ? update : task)),
             }));
         } catch (error) {
-            console.error("タスクの更新に失敗しました", error);
+            if (error instanceof taskApi.TaskConflictError) {
+                console.error(`${error.name}: ${error.message}`);
+            } else if (error instanceof taskApi.TaskNotFoundError) {
+                console.error(`${error.name}: ${error.message}`);
+            } else {
+                console.error("タスクの更新に失敗しました", error);
+            }
+            return false;
         }
+        return true;
     },
 
     removeTask: async (id) => {
