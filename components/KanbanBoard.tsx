@@ -119,6 +119,7 @@ function KanbanColumn({
 
 export function KanbanBoard() {
     const tasks = useTaskStore((state) => state.tasks);
+    const isFOrmOpen = useTaskStore((state) => state.isFormOpen);
     const fetchTasks = useTaskStore((state) => state.fetchTasks);
     const openCreateForm = useTaskStore((state) => state.openCreateForm);
     const editTask = useTaskStore((state) => state.editTask);
@@ -176,14 +177,16 @@ export function KanbanBoard() {
         const activeTask = tasks.find((task) => task.id === active.id);
         if (!activeTask) return;
 
+        // 重なっていたのがカラムかカードかに関わらず、そのステータスを取得する
         const newStatus = resolveNewStatus(String(over.id), tasks);
 
         if (newStatus && newStatus !== activeTask.status) {
+            // 未理解
             moveTaskStatus(activeTask.id, newStatus);
         }
     }
 
-    // ドロップした結果を確定させる。
+    // ドロップした結果を判定・反映させる。
     function handleDragEnd(event: DragEndEvent) {
         if (!canEditTask()) return;
 
@@ -196,10 +199,14 @@ export function KanbanBoard() {
         const activeTask = tasks.find((task) => task.id === active.id);
         if (!activeTask) return;
         
+        // 重なっていたのがカラムかカードかに関わらず、そのステータスを取得する
         const newStatus = resolveNewStatus(String(over.id), tasks);
+        
         const startedFrom = dragStartStatusRef.current;
 
+        // ドラッグ開始時のステータスとドロップ時のステータスが異なる場合
         if (newStatus && startedFrom && newStatus !== startedFrom) {
+            // ドラッグ&ドロップした要素のステータスを変更
             editTask(activeTask.id, { status: newStatus });
         }
 
@@ -234,7 +241,7 @@ export function KanbanBoard() {
                 </div>
             </DndContext>
 
-            <TaskForm />
+            {isFOrmOpen && <TaskForm />}
         </div>
     );
 }
