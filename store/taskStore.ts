@@ -1,6 +1,10 @@
 import { create } from "zustand";
 import { Task, TaskStatus } from "@/types/task";
 import * as taskApi from "@/lib/tasks";
+import { 
+    errorMessages,
+    CommonError
+} from "@/lib/errors";
 
 type TaskStore = {
     // --- サーバー状態（supabaseのデータキャッシュ） --- 
@@ -57,7 +61,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
             const tasks = await taskApi.getTasks();
             set({ tasks });
         } catch (error) {
-            console.error("タスクの取得に失敗しました", error);
+            console.error(errorMessages.taskFetchFailed, error);
         }
     },
 
@@ -66,13 +70,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
             const newTask = await taskApi.createTask(input);
             set((state) => ({ tasks: [...state.tasks, newTask] }));
         } catch (error) {
-            console.error("タスクの作成に失敗しました", error);
+            console.error(errorMessages.taskCreateFailed, error);
         }
     },
 
     editTask: async (id, change) => {
         const current = get().tasks.find((task) => task.id === id);
-        if (!current) return new Error("不明なエラー");
+        if (!current) {
+            console.error(errorMessages.taskUpdateFailed);
+            return new CommonError();
+        };
         try {
             // 楽観的排他制御を行うため、現在のバージョンを引き渡す
             const update = await taskApi.updateTask(id, change, current.version);
@@ -80,16 +87,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
                 tasks: state.tasks.map((task) => (task.id === id ? update : task)),
             }));
         } catch (error) {
-            if (error instanceof taskApi.TaskConflictError) {
-                console.error(`${error.name}: ${error.message}`);
-                return error;
-            } else if (error instanceof taskApi.TaskNotFoundError) {
-                console.error(`${error.name}: ${error.message}`);
-                return error;
-            } else {
-                console.error("タスクの更新に失敗しました", error);
-            }
-            return new Error("不明なエラー");
+            console.error(errorMessages.taskUpdateFailed, error);
+            return error instanceof Error? error : new CommonError(error);
         }
         return null;
     },
@@ -99,7 +98,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
             await taskApi.deleteTask(id);
             set((state) => ({ tasks: state.tasks.filter((task) => task.id !== id ) }));
         } catch (error) {
-            console.error("タスクの削除に失敗しました", error);
+            console.error(errorMessages.taskDeleteFailed, error);
         }
     },
 
