@@ -3,6 +3,8 @@
 import { useState, FormEvent } from "react";
 import { useTaskStore } from "@/store/taskStore";
 import { Task } from "@/types/task";
+import { errorMessages } from "@/lib/errors";
+import { toastMessages } from "@/lib/messages";
 
 export function TaskForm() {
     const isFormOpen = useTaskStore((state) => state.isFormOpen);
@@ -29,9 +31,12 @@ export function TaskForm() {
             const result: Error | null = await editTask(editingTask.id, { title, priority });
             // 更新に失敗した場合
             if (result) {
-                openToast(result.message);
-                // 最新のデータを取得
+                openToast([
+                    { status: "error", text: result.message },
+                    { status: "error", text: errorMessages.taskUpdateFailed }
+                ]);
                 await fetchTasks();
+                openToast([{ status: "info", text: toastMessages.syncRecentData }]);
             }
         } else {
             addTask({ title, priority });

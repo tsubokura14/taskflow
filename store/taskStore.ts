@@ -6,6 +6,14 @@ import {
     CommonError
 } from "@/lib/errors";
 
+export type ToastItem = {
+    id: string;
+    status: ToastStatus;
+    text: string;
+}
+export type ToastStatus = "success" | "error" | "warning" | "info";
+type ToastInput = Omit<ToastItem, "id">;
+
 type TaskStore = {
     // --- サーバー状態（supabaseのデータキャッシュ） --- 
     tasks: Task[];
@@ -25,10 +33,10 @@ type TaskStore = {
     openCreateForm: () => void;
     openEditForm: (taskId: string) => void;
     closeForm: () => void;
-    isToastDisplay: boolean,
-    toastText: string;
-    openToast: (toastText: string) => void;
-    closeToast: () => void;
+
+    toastItems: ToastItem[];
+    openToast: (items: ToastInput[]) => void;
+    closeToast: (id: string) => void;
 };
 
 /**
@@ -125,15 +133,15 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         set({ isFormOpen: false, editingTaskId: null });
     },
 
-    isToastDisplay: false,
-    toastText: "",
+    toastItems: [],
 
-    openToast: (toastText: string) => {
-        set({ isToastDisplay: true, toastText });
+    openToast: (items: ToastInput[]) => {
+        const newItems = items.map((item) => ({ id: crypto.randomUUID(), ...item }));
+        set((state) => ({ toastItems: [...state.toastItems, ...newItems]}));
     },
 
-    closeToast: () => {
-        set({ isToastDisplay: false, toastText: "" });
+    closeToast: (id) => {
+        set((state) => ({ toastItems: state.toastItems.filter((item) => item.id !== id) }));
     }
 
 }));
