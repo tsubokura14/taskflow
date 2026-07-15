@@ -120,7 +120,7 @@ function KanbanColumn({
 
 export function KanbanBoard() {
     const tasks = useTaskStore((state) => state.tasks);
-    const isFOrmOpen = useTaskStore((state) => state.isFormOpen);
+    const isFormOpen = useTaskStore((state) => state.isFormOpen);
     const fetchTasks = useTaskStore((state) => state.fetchTasks);
     const openCreateForm = useTaskStore((state) => state.openCreateForm);
     const editTask = useTaskStore((state) => state.editTask);
@@ -211,9 +211,9 @@ export function KanbanBoard() {
             const result: Error | null = await editTask(activeTask.id, { status: newStatus });
             // 更新に失敗した場合
             if (result) {
+                openToast(result.message);
                 // 最新のデータを反映
                 await fetchTasks();
-                openToast(result.message);
             }
         }
 
@@ -250,7 +250,7 @@ export function KanbanBoard() {
                 </div>
             </DndContext>
 
-            {isFOrmOpen && <TaskForm />}
+            {isFormOpen && <TaskForm />}
         </div>
     );
 }

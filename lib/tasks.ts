@@ -1,5 +1,10 @@
 import { supabase } from "@/lib/supabaseClient";
 import { Task } from "@/types/task";
+import { 
+    TaskDbError,
+    TaskConflictError,
+    TaskNotFoundError
+} from "@/lib/errors";
 
 const PROJECT_ID = "project_001";
 const CURRENT_USER_ID = "user_001";
@@ -40,20 +45,6 @@ function rowToTask(row: TaskRow): Task {
     };
 }
 
-export class TaskConflictError extends Error {
-    constructor() {
-        super("データが更新されているため保存できませんでした。");
-        this.name = "TaskConflictError";
-    }
-}
-
-export class TaskNotFoundError extends Error {
-    constructor() {
-        super("対象のタスクが見つかりませんでした。");
-        this.name = "TaskNotFoundError";
-    }
- } 
-
 export async function getTasks(): Promise<Task[]> {
     const { data, error } = await supabase
         .from("task")
@@ -61,7 +52,7 @@ export async function getTasks(): Promise<Task[]> {
         .eq("project_id", PROJECT_ID)
         .order("created_at", { ascending: true });
     
-    if (error) throw error;
+    if (error) throw new TaskDbError(error);
     return (data as TaskRow[]).map(rowToTask);
 }
 
@@ -83,7 +74,7 @@ export async function createTask(input: {
         .select() // insertした行をそのまま返却させる。
         .single(); // 返却する形式に単一オブジェクト{...}を指定する。
 
-    if (error) throw error;
+    if (error) throw new TaskDbError(error);
     return rowToTask(data as TaskRow);
 }
 
@@ -104,7 +95,7 @@ export async function updateTask(
         .eq("version", currentVersion)  // 楽観的排他制御
         .select() // updateした行をそのまま返却させる。
 
-    if (error) throw error;
+    if (error) throw new TaskDbError(error);
 
     if (data.length === 0) {
         // WHEREに一致しなかった理由（競合 or 存在しない）を切り分けるため、
@@ -115,7 +106,7 @@ export async function updateTask(
             .eq("id", id)
             .maybeSingle();
 
-        if (existError) throw existError;
+        if (existError) throw new TaskDbError(existError);
         throw existing ? new TaskConflictError() : new TaskNotFoundError();
     }
 
@@ -124,5 +115,5 @@ export async function updateTask(
 
 export async function deleteTask(id: string): Promise<void> {
     const { error } = await supabase.from("task").delete().eq("id", id);
-    if (error) throw error;
+    if (error) throw new TaskDbError(error);
 }

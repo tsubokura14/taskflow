@@ -28,10 +28,10 @@ export function TaskForm() {
         if (editingTask) {
             const result: Error | null = await editTask(editingTask.id, { title, priority });
             // 更新に失敗した場合
-            if (result && result.message) {
+            if (result) {
+                openToast(result.message);
                 // 最新のデータを取得
                 await fetchTasks();
-                openToast(result.message);
             }
         } else {
             addTask({ title, priority });
