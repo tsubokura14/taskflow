@@ -12,13 +12,16 @@ import {
     useSensor,
     useSensors
 } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { canCreateTask, canEditTask } from "@/lib/permissions"
+import { toastMessages } from "@/lib/messages";
 import { useTaskStore } from "@/store/taskStore";
-import { Toast } from "./Toast";
 import { Task, TaskStatus } from "@/types/task";
+import { Toast } from "./Toast";
 import { TaskCard } from "./TaskCard";
 import { TaskForm } from "./TaskForm";
-import { canCreateTask, canEditTask } from "@/lib/permissions"
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { error } from "node:console";
+import { errorMessages } from "@/lib/errors";
 
 const columns: { status: TaskStatus; label: string }[] = [
     { status: "todo", label: "未着手" },
@@ -211,9 +214,13 @@ export function KanbanBoard() {
             const result: Error | null = await editTask(activeTask.id, { status: newStatus });
             // 更新に失敗した場合
             if (result) {
-                openToast(result.message);
+                openToast([
+                    { status: "error", text: result.message },
+                    { status: "error", text: errorMessages.taskUpdateFailed }
+                ]);
                 // 最新のデータを反映
                 await fetchTasks();
+                openToast([{ status: "info", text: toastMessages.syncRecentData }]);
             }
         }
 
