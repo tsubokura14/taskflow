@@ -2,7 +2,7 @@
 
 import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
-import { Task } from "@/types/task";
+import { Task } from "@/types";
 import { useTaskStore } from "@/store/taskStore";
 import { canEditTask, canDeleteTask } from "@/lib/permissions" 
 

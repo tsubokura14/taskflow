@@ -16,7 +16,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { canCreateTask, canEditTask } from "@/lib/permissions"
 import { toastMessages } from "@/lib/messages";
 import { useTaskStore } from "@/store/taskStore";
-import { Task, TaskStatus } from "@/types/task";
+import { Task, TaskStatus } from "@/types";
 import { Toast } from "./Toast";
 import { TaskCard } from "./TaskCard";
 import { TaskForm } from "./TaskForm";

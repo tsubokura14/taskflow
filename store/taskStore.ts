@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Task, TaskStatus } from "@/types/task";
+import { Task, TaskStatus } from "@/types";
 import * as taskApi from "@/lib/tasks";
 import { 
     errorMessages,

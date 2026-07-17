@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useTaskStore } from "@/store/taskStore";
-import { Task } from "@/types/task";
+import { Task } from "@/types";
 import { errorMessages } from "@/lib/errors";
 import { toastMessages } from "@/lib/messages";
 

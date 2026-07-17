@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
-import { Task } from "@/types/task";
+import { Task } from "@/types";
 import { 
     TaskDbError,
     TaskConflictError,
