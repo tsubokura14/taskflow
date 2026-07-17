@@ -1,5 +1,5 @@
-import { KanbanBoard } from "@/components/KanbanBoard";
+import { DummyLogin } from "@/components/DummyLogin";
 
-export default function Home() {
-  return <KanbanBoard />;
+export default function DummyLoginPage() {
+  return <DummyLogin />;
 }
