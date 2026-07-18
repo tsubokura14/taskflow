@@ -31,7 +31,7 @@ function rowToWorkspace(row: WorkspaceRow): Workspace {
 // }
 
 // スタブ
-export function getWorkspace(): Workspace[] {
+export async function getWorkspaces(): Promise<Workspace[]> {
     const data: WorkspaceRow[] = [
         {
             id: "001",
@@ -59,5 +59,7 @@ export function getWorkspace(): Workspace[] {
             deleted: false
         }
     ]
-    return (data as WorkspaceRow[]).map(rowToWorkspace);
+    return (data as WorkspaceRow[])
+        .filter((row) => !row.deleted)
+        .map(rowToWorkspace);
 }
