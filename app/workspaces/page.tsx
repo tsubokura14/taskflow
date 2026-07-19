@@ -1,17 +1,16 @@
+"use client"
+
+import { useEffect } from "react";
 import Link from "next/link"
+import { useWorkspaceStore } from "@/store/workspaceStore";
 
 export default function WorkspacesPage() {
-    const sampleWorkspaces: string[] = [
-        "サンプルワークスペース１",
-        "サンプルワークスペース２",
-        "サンプルワークスペース３",
-        "サンプルワークスペース４",
-        "サンプルワークスペース５",
-        "サンプルワークスペース６",
-        "サンプルワークスペース７",
-        "サンプルワークスペース８",
-        "サンプルワークスペース９"
-    ];
+    const workspaces = useWorkspaceStore((state) => state.workspaces);
+    const fetchWorkspaces = useWorkspaceStore((state) => state.fetchWorkspaces);
+
+    useEffect(() => {
+        fetchWorkspaces();
+    }, [fetchWorkspaces]);
 
     return (
         <div className="flex flex-col items-center min-h-screen p-8 bg-gray-50">
@@ -23,16 +22,12 @@ export default function WorkspacesPage() {
                         作成
                     </button>
                 </Link>
-                {/* <label>
-                    検索：
-                    <input type="text" />
-                </label> */}
             </div>
             <div className="grid grid-cols-3 gap-2 w-full">
-                {sampleWorkspaces.map((name) => (
-                    <div key={name} className="flex justify-between w-full border border-gray-200 rounded-xl p-4 bg-white">
+                {workspaces.map((workspace) => (
+                    <div key={workspace.id} className="flex justify-between w-full border border-gray-200 rounded-xl p-4 bg-white">
                         <Link href="/workspaces/projects">
-                            <button>{name}</button>
+                            <button>{workspace.name}</button>
                         </Link>
                         <Link href="/workspaces/settings">
                             <button>設定</button>

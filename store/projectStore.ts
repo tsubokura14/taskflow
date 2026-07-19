@@ -4,13 +4,13 @@ import * as projectApi from "@/lib/projects";
 
 type projectStore = {
     projects: Project[];
-    fetchproject: () => Promise<void>
+    fetchProjects: () => Promise<void>
 }
 
 export const useProjectStore = create<projectStore>((set) => ({
     projects: [],
 
-    fetchproject: async () => {
+    fetchProjects: async () => {
         try {
             const projects = await projectApi.getProjects();
             set({ projects });

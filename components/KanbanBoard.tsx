@@ -20,7 +20,6 @@ import { Task, TaskStatus } from "@/types";
 import { Toast } from "./Toast";
 import { TaskCard } from "./TaskCard";
 import { TaskForm } from "./TaskForm";
-import { error } from "node:console";
 import { errorMessages } from "@/lib/errors";
 
 const columns: { status: TaskStatus; label: string }[] = [

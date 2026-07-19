@@ -4,13 +4,13 @@ import * as workspaceApi from "@/lib/workspaces";
 
 type WorkspaceStore = {
     workspaces: Workspace[];
-    fetchWorkspace: () => Promise<void>
+    fetchWorkspaces: () => Promise<void>
 }
 
 export const useWorkspaceStore = create<WorkspaceStore>((set) => ({
     workspaces: [],
 
-    fetchWorkspace: async () => {
+    fetchWorkspaces: async () => {
         try {
             const workspaces = await workspaceApi.getWorkspaces();
             set({ workspaces });

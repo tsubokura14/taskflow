@@ -31,7 +31,7 @@ function rowToWorkspace(row: WorkspaceRow): Workspace {
 // }
 
 // スタブ
-export async function getWorkspaces(): Promise<Workspace[]> {
+export function getWorkspaces(): Workspace[] {
     const data: WorkspaceRow[] = [
         {
             id: "001",

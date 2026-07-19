@@ -33,12 +33,12 @@ function rowToProject(row: ProjectRow): Project {
 // }
 
 // スタブ
-export async function getProjects(): Promise<Project[]> {
+export function getProjects(): Project[] {
     const data: ProjectRow[] = [
         {
             id: "001",
             workspaceId: "001",
-            name: "サンプルワークスペース001",
+            name: "サンプルプロジェクト001",
             createdBy: "user001",
             updatedBy: "user001",
             createdAt: "20260701",
@@ -47,7 +47,7 @@ export async function getProjects(): Promise<Project[]> {
         }, {
             id: "002",
             workspaceId: "001",
-            name: "サンプルワークスペース002",
+            name: "サンプルプロジェクト002",
             createdBy: "user002",
             updatedBy: "user002",
             createdAt: "20260701",
@@ -56,12 +56,21 @@ export async function getProjects(): Promise<Project[]> {
         }, {
             id: "003",
             workspaceId: "003",
-            name: "サンプルワークスペース003",
+            name: "サンプルプロジェクト003",
             createdBy: "user003",
             updatedBy: "user003",
             createdAt: "20260701",
             updatedAt: "20260701",
             deleted: false
+        }, {
+            id: "003",
+            workspaceId: "003",
+            name: "サンプルプロジェクト004",
+            createdBy: "user003",
+            updatedBy: "user003",
+            createdAt: "20260701",
+            updatedAt: "20260701",
+            deleted: true
         }
     ]
     return (data as ProjectRow[])
