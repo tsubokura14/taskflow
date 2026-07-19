@@ -1,15 +1,20 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, use } from "react";
 import Link from "next/link"
 import { useProjectStore } from "@/store/projectStore";
 
-export default function ProjectsPage() {
+type Props = {
+    params: Promise<{ workspaceId: string }>
+}
+
+export default function ProjectsPage({ params }: Props) {
+    const { workspaceId } = use(params);
     const projects = useProjectStore((state) => state.projects);
     const fetchProjects = useProjectStore((state) => state.fetchProjects);
 
     useEffect(() => {
-        fetchProjects();
+        fetchProjects(workspaceId);
     }, [fetchProjects]);
 
     return (
@@ -26,7 +31,7 @@ export default function ProjectsPage() {
             <div className="grid grid-cols-3 gap-2 w-full">
                 {projects.map((project) => (
                     <div key={project.id} className="flex justify-between w-full border border-gray-200 rounded-xl p-4 bg-white">
-                        <Link href="/workspaces/projects/boards">
+                        <Link href={`/workspaces/${project.workspaceId}/projects/${project.id}/boards`}>
                             <button>{project.name}</button>
                         </Link>
                         <Link href="/workspaces/projects/settings">

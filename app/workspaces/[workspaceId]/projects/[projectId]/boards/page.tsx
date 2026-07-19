@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef} from "react";
+import { useEffect, useMemo, useRef, use} from "react";
 import {
     DndContext,
     DragEndEvent,
@@ -17,9 +17,9 @@ import { canCreateTask, canEditTask } from "@/lib/permissions"
 import { toastMessages } from "@/lib/messages";
 import { useTaskStore } from "@/store/taskStore";
 import { Task, TaskStatus } from "@/types";
-import { Toast } from "./Toast";
-import { TaskCard } from "./TaskCard";
-import { TaskForm } from "./TaskForm";
+import { Toast } from "@/components/Toast";
+import { TaskCard } from "@/components/TaskCard";
+import { TaskForm } from "@/components/TaskForm";
 import { errorMessages } from "@/lib/errors";
 
 const columns: { status: TaskStatus; label: string }[] = [
@@ -120,7 +120,12 @@ function KanbanColumn({
     )
 }
 
-export function KanbanBoard() {
+type Props = {
+    params: Promise<{ projectId: string }>
+}
+
+export default function KanbanBoard({ params }: Props) {
+    const { projectId } = use(params)
     const tasks = useTaskStore((state) => state.tasks);
     const isFormOpen = useTaskStore((state) => state.isFormOpen);
     const fetchTasks = useTaskStore((state) => state.fetchTasks);
@@ -161,7 +166,7 @@ export function KanbanBoard() {
     ], []);
 
     useEffect(() => {
-        fetchTasks();
+        fetchTasks(projectId);
     }, [fetchTasks]);
 
     function handleDragStart(event: DragStartEvent) {
@@ -218,7 +223,7 @@ export function KanbanBoard() {
                     { status: "error", text: errorMessages.taskUpdateFailed }
                 ]);
                 // 最新のデータを反映
-                await fetchTasks();
+                await fetchTasks(projectId);
                 openToast([{ status: "info", text: toastMessages.syncRecentData }]);
             }
         }
@@ -260,5 +265,3 @@ export function KanbanBoard() {
         </div>
     );
 }
-
-

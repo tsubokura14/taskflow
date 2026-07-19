@@ -33,10 +33,10 @@ function rowToProject(row: ProjectRow): Project {
 // }
 
 // スタブ
-export function getProjects(): Project[] {
+export function getProjects(workspaceId: string): Project[] {
     const data: ProjectRow[] = [
         {
-            id: "001",
+            id: "project_001",
             workspaceId: "001",
             name: "サンプルプロジェクト001",
             createdBy: "user001",
@@ -45,7 +45,7 @@ export function getProjects(): Project[] {
             updatedAt: "20260701",
             deleted: false
         }, {
-            id: "002",
+            id: "project_002",
             workspaceId: "001",
             name: "サンプルプロジェクト002",
             createdBy: "user002",
@@ -54,7 +54,7 @@ export function getProjects(): Project[] {
             updatedAt: "20260701",
             deleted: false
         }, {
-            id: "003",
+            id: "project_003",
             workspaceId: "003",
             name: "サンプルプロジェクト003",
             createdBy: "user003",
@@ -63,7 +63,7 @@ export function getProjects(): Project[] {
             updatedAt: "20260701",
             deleted: false
         }, {
-            id: "003",
+            id: "project_004",
             workspaceId: "003",
             name: "サンプルプロジェクト004",
             createdBy: "user003",
@@ -74,6 +74,7 @@ export function getProjects(): Project[] {
         }
     ]
     return (data as ProjectRow[])
+        .filter((row) => row.workspaceId === workspaceId)
         .filter((row) => !row.deleted)
         .map(rowToProject);
 }

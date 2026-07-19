@@ -17,7 +17,7 @@ type ToastInput = Omit<ToastItem, "id">;
 type TaskStore = {
     // --- サーバー状態（supabaseのデータキャッシュ） --- 
     tasks: Task[];
-    fetchTasks: () => Promise<void>;
+    fetchTasks: (projectId: string) => Promise<void>;
     addTask: (input: { title: string; priority: Task["priority"] }) => Promise<void>;
     editTask: (
         id: string,
@@ -64,9 +64,9 @@ type TaskStore = {
 export const useTaskStore = create<TaskStore>((set, get) => ({
     tasks: [],
 
-    fetchTasks: async () => {
+    fetchTasks: async (projectId) => {
         try {
-            const tasks = await taskApi.getTasks();
+            const tasks = await taskApi.getTasks(projectId);
             set({ tasks });
         } catch (error) {
             console.error(errorMessages.taskFetchFailed, error);

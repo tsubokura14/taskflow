@@ -31,7 +31,7 @@ function rowToWorkspace(row: WorkspaceRow): Workspace {
 // }
 
 // スタブ
-export function getWorkspaces(): Workspace[] {
+export function getWorkspaces(workspaceIds: string[]): Workspace[] {
     const data: WorkspaceRow[] = [
         {
             id: "001",
@@ -59,7 +59,9 @@ export function getWorkspaces(): Workspace[] {
             deleted: false
         }
     ]
+    console.log("発火！")
     return (data as WorkspaceRow[])
+        .filter((row) => workspaceIds.includes(row.id))
         .filter((row) => !row.deleted)
         .map(rowToWorkspace);
 }

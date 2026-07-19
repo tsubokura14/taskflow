@@ -45,11 +45,11 @@ function rowToTask(row: TaskRow): Task {
     };
 }
 
-export async function getTasks(): Promise<Task[]> {
+export async function getTasks(projectId: string): Promise<Task[]> {
     const { data, error } = await supabase
         .from("task")
         .select("*")
-        .eq("project_id", PROJECT_ID)
+        .eq("project_id", projectId)
         .order("created_at", { ascending: true });
     
     if (error) throw new TaskDbError(error);
