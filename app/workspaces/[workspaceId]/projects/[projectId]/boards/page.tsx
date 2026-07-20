@@ -17,7 +17,6 @@ import { canCreateTask, canEditTask } from "@/lib/permissions"
 import { toastMessages } from "@/lib/messages";
 import { useTaskStore } from "@/store/taskStore";
 import { Task, TaskStatus } from "@/types";
-import { Toast } from "@/components/Toast";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskForm } from "@/components/TaskForm";
 import { errorMessages } from "@/lib/errors";
@@ -167,7 +166,7 @@ export default function KanbanBoard({ params }: Props) {
 
     useEffect(() => {
         fetchTasks(projectId);
-    }, [fetchTasks]);
+    }, [fetchTasks, projectId]);
 
     function handleDragStart(event: DragStartEvent) {
         const activeTask = tasks.find((task) => task.id === event.active.id);
@@ -233,7 +232,6 @@ export default function KanbanBoard({ params }: Props) {
 
     return (
         <div className="p-6">
-            <Toast />
 
             {canCreateTask() && (
                 <button

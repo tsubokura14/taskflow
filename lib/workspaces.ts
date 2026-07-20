@@ -1,4 +1,3 @@
-import { supabase } from "./supabaseClient"
 import { Workspace } from "@/types"
 
 export type WorkspaceRow = {
@@ -59,7 +58,6 @@ export function getWorkspaces(workspaceIds: string[]): Workspace[] {
             deleted: false
         }
     ]
-    console.log("発火！")
     return (data as WorkspaceRow[])
         .filter((row) => workspaceIds.includes(row.id))
         .filter((row) => !row.deleted)

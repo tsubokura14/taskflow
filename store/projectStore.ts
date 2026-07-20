@@ -4,7 +4,9 @@ import * as projectApi from "@/lib/projects";
 
 type projectStore = {
     projects: Project[];
-    fetchProjects: (workspaceId: string) => Promise<void>
+    fetchProjects: (workspaceId: string) => Promise<void>;
+    currentProjectId: string | null;
+    setCurrentProjectId: (projectId: string | null) => void;
 }
 
 export const useProjectStore = create<projectStore>((set) => ({
@@ -17,5 +19,9 @@ export const useProjectStore = create<projectStore>((set) => ({
         } catch (error) {
             console.error(error);
         }
-    }
+    },
+
+    currentProjectId: null,
+
+    setCurrentProjectId: (projectId) => set({ currentProjectId: projectId })
 }));

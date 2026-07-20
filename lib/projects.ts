@@ -1,4 +1,3 @@
-import { supabase } from "./supabaseClient"
 import { Project } from "@/types"
 
 export type ProjectRow = {

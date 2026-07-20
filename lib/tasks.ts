@@ -6,7 +6,6 @@ import {
     TaskNotFoundError
 } from "@/lib/errors";
 
-const PROJECT_ID = "project_001";
 const CURRENT_USER_ID = "user_001";
 
 /**
@@ -57,13 +56,14 @@ export async function getTasks(projectId: string): Promise<Task[]> {
 }
 
 export async function createTask(input: {
+    projectId: string;
     title: string;
     priority: Task["priority"];
 }): Promise<Task> {
     const { data, error } = await supabase
         .from("task")
         .insert({
-            project_id: PROJECT_ID,
+            project_id: input.projectId,
             title: input.title,
             status: "todo",
             priority: input.priority,

@@ -5,6 +5,8 @@ import * as workspaceApi from "@/lib/workspaces";
 type WorkspaceStore = {
     workspaces: Workspace[];
     fetchWorkspaces: (workspaceId: string[]) => Promise<void>
+    currentWorkspaceId: string | null;
+    setCurrentWorkspaceId: (id: string | null) => void;
 }
 
 export const useWorkspaceStore = create<WorkspaceStore>((set) => ({
@@ -17,5 +19,9 @@ export const useWorkspaceStore = create<WorkspaceStore>((set) => ({
         } catch (error) {
             console.error(error);
         }
-    }
+    },
+
+    currentWorkspaceId: null,
+
+    setCurrentWorkspaceId: (id) => set({ currentWorkspaceId: id }),
 }));

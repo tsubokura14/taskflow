@@ -18,7 +18,7 @@ type TaskStore = {
     // --- サーバー状態（supabaseのデータキャッシュ） --- 
     tasks: Task[];
     fetchTasks: (projectId: string) => Promise<void>;
-    addTask: (input: { title: string; priority: Task["priority"] }) => Promise<void>;
+    addTask: (input: { projectId: string, title: string; priority: Task["priority"] }) => Promise<void>;
     editTask: (
         id: string,
         change: Partial<Pick<Task, "title" | "status" | "priority">>
