@@ -1,6 +1,7 @@
 export type Workspace = {
     id: string,
     name: string,
+    version: number,
     createdBy: string,
     updatedBy: string,
     createdAt: string,
@@ -11,6 +12,7 @@ export type Project = {
     id: string,
     workspaceId: string,
     name: string,
+    version: number,
     createdBy: string,
     updatedBy: string,
     createdAt: string,

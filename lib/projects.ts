@@ -4,11 +4,12 @@ export type ProjectRow = {
     id: string,
     workspaceId: string,
     name: string,
+    version: number,
     createdBy: string,
     updatedBy: string,
     createdAt: string,
     updatedAt: string,
-    deleted: boolean
+    deletedAt: string | null
 }
 
 function rowToProject(row: ProjectRow): Project {
@@ -16,6 +17,7 @@ function rowToProject(row: ProjectRow): Project {
         id: row.id,
         workspaceId: row.workspaceId,
         name: row.name,
+        version: row.version,
         createdBy: row.createdBy,
         updatedBy: row.updatedBy,
         createdAt: row.createdAt,
@@ -38,42 +40,46 @@ export function getProjects(workspaceId: string): Project[] {
             id: "project_001",
             workspaceId: "001",
             name: "サンプルプロジェクト001",
+            version: 1,
             createdBy: "user001",
             updatedBy: "user001",
             createdAt: "20260701",
             updatedAt: "20260701",
-            deleted: false
+            deletedAt: null
         }, {
             id: "project_002",
             workspaceId: "001",
             name: "サンプルプロジェクト002",
-            createdBy: "user002",
-            updatedBy: "user002",
+            version: 1,
+            createdBy: "user001",
+            updatedBy: "user001",
             createdAt: "20260701",
             updatedAt: "20260701",
-            deleted: false
+            deletedAt: null
         }, {
             id: "project_003",
             workspaceId: "003",
             name: "サンプルプロジェクト003",
-            createdBy: "user003",
-            updatedBy: "user003",
+            version: 1,
+            createdBy: "user001",
+            updatedBy: "user001",
             createdAt: "20260701",
             updatedAt: "20260701",
-            deleted: false
+            deletedAt: null
         }, {
             id: "project_004",
             workspaceId: "003",
             name: "サンプルプロジェクト004",
-            createdBy: "user003",
-            updatedBy: "user003",
+            version: 1,
+            createdBy: "user001",
+            updatedBy: "user001",
             createdAt: "20260701",
             updatedAt: "20260701",
-            deleted: true
+            deletedAt: "20260701"
         }
     ]
     return (data as ProjectRow[])
         .filter((row) => row.workspaceId === workspaceId)
-        .filter((row) => !row.deleted)
+        .filter((row) => row.deletedAt !== null)
         .map(rowToProject);
 }

@@ -7,7 +7,7 @@ type Props = {
     children: React.ReactNode;
 }
 
-export default function BoardLayout({ params, children }: Props ) {
+export default function ProjectLayout({ params, children }: Props ) {
     const { projectId } = use(params);
     const setCurrentProjectId = useProjectStore((state) => state.setCurrentProjectId);
 
