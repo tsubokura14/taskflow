@@ -2,9 +2,10 @@
 
 import { useState, FormEvent } from "react";
 import { useTaskStore } from "@/store/taskStore";
-import { Task } from "@/types/task";
+import { Task } from "@/types";
 import { errorMessages } from "@/lib/errors";
 import { toastMessages } from "@/lib/messages";
+import { useProjectStore } from "@/store/projectStore";
 
 export function TaskForm() {
     const isFormOpen = useTaskStore((state) => state.isFormOpen);
@@ -15,6 +16,7 @@ export function TaskForm() {
     const editTask = useTaskStore((state) => state.editTask);
     const closeForm = useTaskStore((state) => state.closeForm);
     const openToast = useTaskStore((state) => state.openToast);
+    const currentProjectId = useProjectStore((state) => state.currentProjectId);
     
     const editingTask = tasks.find((task) => task.id === editingTaskId);
 
@@ -35,11 +37,17 @@ export function TaskForm() {
                     { status: "error", text: result.message },
                     { status: "error", text: errorMessages.taskUpdateFailed }
                 ]);
-                await fetchTasks();
-                openToast([{ status: "info", text: toastMessages.syncRecentData }]);
+                if (currentProjectId) {
+                    await fetchTasks(currentProjectId);
+                    openToast([{ status: "info", text: toastMessages.syncRecentData }]);
+                }
             }
         } else {
-            addTask({ title, priority });
+            if (currentProjectId) {
+                addTask({ projectId: currentProjectId, title, priority });
+            } else {
+                openToast([{ status: "error", text: toastMessages.commonError }]);
+            }
         }
         closeForm();
     }

@@ -1,12 +1,11 @@
 import { supabase } from "@/lib/supabaseClient";
-import { Task } from "@/types/task";
+import { Task } from "@/types";
 import { 
     TaskDbError,
     TaskConflictError,
     TaskNotFoundError
 } from "@/lib/errors";
 
-const PROJECT_ID = "project_001";
 const CURRENT_USER_ID = "user_001";
 
 /**
@@ -45,11 +44,11 @@ function rowToTask(row: TaskRow): Task {
     };
 }
 
-export async function getTasks(): Promise<Task[]> {
+export async function getTasks(projectId: string): Promise<Task[]> {
     const { data, error } = await supabase
         .from("task")
         .select("*")
-        .eq("project_id", PROJECT_ID)
+        .eq("project_id", projectId)
         .order("created_at", { ascending: true });
     
     if (error) throw new TaskDbError(error);
@@ -57,13 +56,14 @@ export async function getTasks(): Promise<Task[]> {
 }
 
 export async function createTask(input: {
+    projectId: string;
     title: string;
     priority: Task["priority"];
 }): Promise<Task> {
     const { data, error } = await supabase
         .from("task")
         .insert({
-            project_id: PROJECT_ID,
+            project_id: input.projectId,
             title: input.title,
             status: "todo",
             priority: input.priority,

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Task, TaskStatus } from "@/types/task";
+import { Task, TaskStatus } from "@/types";
 import * as taskApi from "@/lib/tasks";
 import { 
     errorMessages,
@@ -17,8 +17,8 @@ type ToastInput = Omit<ToastItem, "id">;
 type TaskStore = {
     // --- サーバー状態（supabaseのデータキャッシュ） --- 
     tasks: Task[];
-    fetchTasks: () => Promise<void>;
-    addTask: (input: { title: string; priority: Task["priority"] }) => Promise<void>;
+    fetchTasks: (projectId: string) => Promise<void>;
+    addTask: (input: { projectId: string, title: string; priority: Task["priority"] }) => Promise<void>;
     editTask: (
         id: string,
         change: Partial<Pick<Task, "title" | "status" | "priority">>
@@ -64,9 +64,9 @@ type TaskStore = {
 export const useTaskStore = create<TaskStore>((set, get) => ({
     tasks: [],
 
-    fetchTasks: async () => {
+    fetchTasks: async (projectId) => {
         try {
-            const tasks = await taskApi.getTasks();
+            const tasks = await taskApi.getTasks(projectId);
             set({ tasks });
         } catch (error) {
             console.error(errorMessages.taskFetchFailed, error);

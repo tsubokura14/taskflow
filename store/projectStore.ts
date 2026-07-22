@@ -1,0 +1,27 @@
+import { create } from "zustand";
+import { Project } from "@/types";
+import * as projectApi from "@/lib/projects";
+
+type projectStore = {
+    projects: Project[];
+    fetchProjects: (workspaceId: string) => Promise<void>;
+    currentProjectId: string | null;
+    setCurrentProjectId: (projectId: string | null) => void;
+}
+
+export const useProjectStore = create<projectStore>((set) => ({
+    projects: [],
+
+    fetchProjects: async (workspaceId) => {
+        try {
+            const projects = await projectApi.getProjects(workspaceId);
+            set({ projects });
+        } catch (error) {
+            console.error(error);
+        }
+    },
+
+    currentProjectId: null,
+
+    setCurrentProjectId: (projectId) => set({ currentProjectId: projectId })
+}));

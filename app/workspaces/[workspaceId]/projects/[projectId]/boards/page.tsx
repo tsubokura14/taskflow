@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef} from "react";
+import { useEffect, useMemo, useRef, use} from "react";
 import {
     DndContext,
     DragEndEvent,
@@ -16,11 +16,9 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { canCreateTask, canEditTask } from "@/lib/permissions"
 import { toastMessages } from "@/lib/messages";
 import { useTaskStore } from "@/store/taskStore";
-import { Task, TaskStatus } from "@/types/task";
-import { Toast } from "./Toast";
-import { TaskCard } from "./TaskCard";
-import { TaskForm } from "./TaskForm";
-import { error } from "node:console";
+import { Task, TaskStatus } from "@/types";
+import { TaskCard } from "@/components/TaskCard";
+import { TaskForm } from "@/components/TaskForm";
 import { errorMessages } from "@/lib/errors";
 
 const columns: { status: TaskStatus; label: string }[] = [
@@ -121,7 +119,12 @@ function KanbanColumn({
     )
 }
 
-export function KanbanBoard() {
+type Props = {
+    params: Promise<{ projectId: string }>
+}
+
+export default function KanbanBoard({ params }: Props) {
+    const { projectId } = use(params)
     const tasks = useTaskStore((state) => state.tasks);
     const isFormOpen = useTaskStore((state) => state.isFormOpen);
     const fetchTasks = useTaskStore((state) => state.fetchTasks);
@@ -162,8 +165,8 @@ export function KanbanBoard() {
     ], []);
 
     useEffect(() => {
-        fetchTasks();
-    }, [fetchTasks]);
+        fetchTasks(projectId);
+    }, [fetchTasks, projectId]);
 
     function handleDragStart(event: DragStartEvent) {
         const activeTask = tasks.find((task) => task.id === event.active.id);
@@ -219,7 +222,7 @@ export function KanbanBoard() {
                     { status: "error", text: errorMessages.taskUpdateFailed }
                 ]);
                 // 最新のデータを反映
-                await fetchTasks();
+                await fetchTasks(projectId);
                 openToast([{ status: "info", text: toastMessages.syncRecentData }]);
             }
         }
@@ -229,7 +232,6 @@ export function KanbanBoard() {
 
     return (
         <div className="p-6">
-            <Toast />
 
             {canCreateTask() && (
                 <button
@@ -261,5 +263,3 @@ export function KanbanBoard() {
         </div>
     );
 }
-
-
