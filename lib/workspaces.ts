@@ -65,6 +65,6 @@ export function getWorkspaces(workspaceIds: string[]): Workspace[] {
     ]
     return (data as WorkspaceRow[])
         .filter((row) => workspaceIds.includes(row.id))
-        .filter((row) => row.deletedAt !== null)
+        .filter((row) => row.deletedAt === null)
         .map(rowToWorkspace);
 }

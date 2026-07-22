@@ -48,7 +48,7 @@ export function getProjects(workspaceId: string): Project[] {
             deletedAt: null
         }, {
             id: "project_002",
-            workspaceId: "001",
+            workspaceId: "002",
             name: "サンプルプロジェクト002",
             version: 1,
             createdBy: "user001",
@@ -80,6 +80,6 @@ export function getProjects(workspaceId: string): Project[] {
     ]
     return (data as ProjectRow[])
         .filter((row) => row.workspaceId === workspaceId)
-        .filter((row) => row.deletedAt !== null)
+        .filter((row) => row.deletedAt === null)
         .map(rowToProject);
 }
