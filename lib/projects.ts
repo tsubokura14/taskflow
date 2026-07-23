@@ -2,9 +2,6 @@ import { Project } from "@/types"
 import { getCurrentDate } from "@/lib/utils";
 import { projectFixtures } from "@/lib/projects.fixtures";
 
-// スタブ使用時の暫定的な永続化先（再代入により模擬的にDBの役割を果たす）
-let projects: ProjectRow[] = projectFixtures
-
 // --- ports ---
 export type CreateProjectInput = {
     workspaceId: string;
@@ -21,17 +18,6 @@ export type DeleteProjectInput = {
     loginUser: string;
 }
 
-/** 
- * ストアとDB/スタブの受け渡しに使用
- * DBとスタブの不整合を防ぐ役割
- */
-export type ProjectApi = {
-    getProjects: (workspaceId: string) => Promise<Project[]>;
-    createProject: (input: CreateProjectInput) => Promise<Project>;
-    updateProject: (input: UpdateProjectInput) => Promise<Project>;
-    deleteProject: (input: DeleteProjectInput) => Promise<void>;
-};
-
 /** DBから受け取る型 */
 export type ProjectRow = {
     id: string,
@@ -44,6 +30,17 @@ export type ProjectRow = {
     updatedAt: string | null,
     deletedAt: string | null
 }
+
+/** 
+ * ストアとDB/スタブの受け渡しに使用
+ * DBとスタブの不整合を防ぐ役割
+ */
+export type ProjectApi = {
+    getProjects: (workspaceId: string) => Promise<Project[]>;
+    createProject: (input: CreateProjectInput) => Promise<Project>;
+    updateProject: (input: UpdateProjectInput) => Promise<Project>;
+    deleteProject: (input: DeleteProjectInput) => Promise<void>;
+};
 
 // Mapper
 function rowToProject(row: ProjectRow): Project {
@@ -59,10 +56,13 @@ function rowToProject(row: ProjectRow): Project {
     }
 }
 
+// スタブ使用時の暫定的な永続化先（再代入により模擬的にDBの役割を果たす）
+let projects: ProjectRow[] = projectFixtures;
+
 // --- スタブ・Adapters ---
 const stubProjectApi = {
     getProjects: async (workspaceId: string) => {
-        const data = projects
+        const data = projects;
         return (data)
             .filter((row) => row.workspaceId === workspaceId)
             .filter((row) => row.deletedAt === null)
