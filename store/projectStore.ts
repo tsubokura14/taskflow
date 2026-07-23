@@ -1,23 +1,20 @@
 import { create } from "zustand";
 import { Project } from "@/types";
-import * as projectApi from "@/lib/projects";
+import { CreateProjectInput, projectApi } from "@/lib/projects";
 
 type ProjectStore = {
-    // --- プロジェクト一覧画面で使用 ---
+    // --- プロジェクト一覧画面 ---
     projects: Project[];
     fetchProjects: (workspaceId: string) => Promise<void>;
-    addProject: (input: {
-        workspaceId: string,
-        name: string,
-        loginUser: string
-    }) => Promise<void>;
-    // --- プロジェクト一覧の配下の画面で使用 ---
+    addProject: (input: CreateProjectInput) => Promise<void>;
+
+    // --- プロジェクト一覧の配下の画面 ---
     currentProjectId: string | null;
     setCurrentProjectId: (projectId: string | null) => void;
 }
 
 export const useProjectStore = create<ProjectStore>((set) => ({
-    // --- プロジェクト一覧画面で使用 ---
+    // --- プロジェクト一覧画面 ---
     projects: [],
 
     fetchProjects: async (workspaceId) => {
@@ -38,7 +35,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         }
     },
 
-    // --- プロジェクト一覧の配下の画面で使用 ---
+    // --- プロジェクト一覧の配下の画面 ---
     currentProjectId: null,
 
     setCurrentProjectId: (projectId) => set({ currentProjectId: projectId })

@@ -1,5 +1,38 @@
 import { Project } from "@/types"
+import { getCurrentDate } from "@/lib/utils";
+import { projectFixtures } from "@/lib/projects.fixtures";
 
+// スタブ使用時の暫定的な永続化先（再代入により模擬的にDBの役割を果たす）
+let projects: ProjectRow[] = projectFixtures
+
+// --- ports ---
+export type CreateProjectInput = {
+    workspaceId: string;
+    name: string;
+    loginUser: string;
+}
+export type UpdateProjectInput = {
+    projectId: string;
+    name: string;
+    loginUser: string;
+}
+export type DeleteProjectInput = {
+    projectId: string;
+    loginUser: string;
+}
+
+/** 
+ * ストアとDB/スタブの受け渡しに使用
+ * DBとスタブの不整合を防ぐ役割
+ */
+export type ProjectApi = {
+    getProjects: (workspaceId: string) => Promise<Project[]>;
+    createProject: (input: CreateProjectInput) => Promise<Project>;
+    updateProject: (input: UpdateProjectInput) => Promise<Project>;
+    deleteProject: (input: DeleteProjectInput) => Promise<void>;
+};
+
+/** DBから受け取る型 */
 export type ProjectRow = {
     id: string,
     workspaceId: string,
@@ -12,6 +45,7 @@ export type ProjectRow = {
     deletedAt: string | null
 }
 
+// Mapper
 function rowToProject(row: ProjectRow): Project {
     return {
         id: row.id,
@@ -25,88 +59,72 @@ function rowToProject(row: ProjectRow): Project {
     }
 }
 
-// フィクスチャ
-const sampleDatas: ProjectRow[] = [
-    {
-        id: "project_001",
-        workspaceId: "001",
-        name: "サンプルプロジェクト001",
-        version: 1,
-        createdBy: "user001",
-        updatedBy: "user001",
-        createdAt: "20260701",
-        updatedAt: "20260701",
-        deletedAt: null
-    }, {
-        id: "project_002",
-        workspaceId: "002",
-        name: "サンプルプロジェクト002",
-        version: 1,
-        createdBy: "user001",
-        updatedBy: "user001",
-        createdAt: "20260701",
-        updatedAt: "20260701",
-        deletedAt: null
-    }, {
-        id: "project_003",
-        workspaceId: "003",
-        name: "サンプルプロジェクト003",
-        version: 1,
-        createdBy: "user001",
-        updatedBy: "user001",
-        createdAt: "20260701",
-        updatedAt: "20260701",
-        deletedAt: null
-    }, {
-        id: "project_004",
-        workspaceId: "003",
-        name: "サンプルプロジェクト004",
-        version: 1,
-        createdBy: "user001",
-        updatedBy: "user001",
-        createdAt: "20260701",
-        updatedAt: "20260701",
-        deletedAt: "20260701"
-    }
-]
+// --- スタブ・Adapters ---
+const stubProjectApi = {
+    getProjects: async (workspaceId: string) => {
+        const data = projects
+        return (data)
+            .filter((row) => row.workspaceId === workspaceId)
+            .filter((row) => row.deletedAt === null)
+            .map(rowToProject);
+    },
 
-// --- スタブ ---
-export function getProjects(workspaceId: string): Project[] {
-    const data = sampleDatas
-    return (data as ProjectRow[])
-        .filter((row) => row.workspaceId === workspaceId)
-        .filter((row) => row.deletedAt === null)
-        .map(rowToProject);
-}
+    createProject: async (input: CreateProjectInput) => {
+        const newProject: ProjectRow = {
+            id: crypto.randomUUID(),
+            workspaceId: input.workspaceId,
+            name: input.name,
+            version: 1,
+            createdBy: input.loginUser,
+            updatedBy: null,
+            createdAt: getCurrentDate(),
+            updatedAt: null,
+            deletedAt: null
+        }
+        projects = [...projects, newProject]; 
+        return rowToProject(newProject);
+    },
+    
+    updateProject: async (input: UpdateProjectInput) => {
+        const target: ProjectRow | undefined = projects
+            .find((data) => data.id === input.projectId);
+        if (!target) {
+            throw new Error("対象のプロジェクトが見つかりませんでした。");
+        }
 
-export function createProject(input: {
-        workspaceId: string,
-        name: string,
-        loginUser: string
-    }): Project {
-    const newProject: ProjectRow = {
-        id: "project_001",
-        workspaceId: input.workspaceId,
-        name: input.name,
-        version: 1,
-        createdBy: input.loginUser,
-        updatedBy: null,
-        createdAt: getCurrentDate(),
-        updatedAt: null,
-        deletedAt: null
-    }
-    return rowToProject(newProject);
-}
+        const newProject: ProjectRow =  {
+            ...target,
+            name: input.name,
+            version: target.version + 1,
+            updatedBy: input.loginUser,
+            updatedAt: getCurrentDate(),
+        };
 
-// スタブ用（本番環境はPostgreSQLで設定）
-function getCurrentDate(): string {
-    const now = new Date();
+        projects = projects
+            .map((row) => row.id === input.projectId ? newProject : row);
 
-    const year = now.getFullYear();
-    // getMonth()は0（1月）～11（12月）を返すため、+1して調整
-    // padStart(2, '0')は、月や日が1桁の場合に2桁へゼロ埋め
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
+        return rowToProject(newProject);
+    },
 
-    return `${year}${month}${day}`;
-}
+    deleteProject: async (input: DeleteProjectInput) => {
+        const target: ProjectRow | undefined = projects
+            .find((data) => data.id === input.projectId);
+        if (!target) {
+            throw new Error("対象のプロジェクトが見つかりませんでした。");
+        }
+
+        const newProject: ProjectRow =  {
+            ...target,
+            version: target.version + 1,
+            updatedBy: input.loginUser,
+            deletedAt: getCurrentDate(),
+        };
+
+        projects = projects
+            .map((row) => row.id === input.projectId ? newProject : row);
+    },
+} satisfies ProjectApi;
+
+// 本番環境とスタブの切り替え点
+// ストアには中身が本番かスタブかを意識させない
+export const projectApi = stubProjectApi;
