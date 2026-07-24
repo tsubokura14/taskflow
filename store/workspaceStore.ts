@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { Workspace } from "@/types";
-import * as workspaceApi from "@/lib/workspaces";
+import { workspaceApi } from "@/lib/workspaces";
 
 type WorkspaceStore = {
     workspaces: Workspace[];
