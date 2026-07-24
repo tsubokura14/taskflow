@@ -15,23 +15,9 @@ type TaskStore = {
     // --- サーバー状態（supabaseのデータキャッシュ） --- 
     tasks: Task[];
     fetchTasks: (projectId: string) => Promise<void>;
-    addTask: (input: { 
-        projectId: string, 
-        title: string; 
-        priority: Task["priority"],
-        loginUser: string }
-    ) => Promise<void>;
-    editTask: (input: {
-        id: string,
-        changes: Partial<Pick<Task, "title" | "status" | "priority">>,
-        currentVersion: number,
-        loginUser: string}
-    ) => Promise<Error | null>;
-    removeTask: (input: {
-        id: string,
-        currentVersion: number,
-        loginUser: string
-    }) => Promise<void>;
+    addTask: (input: CreateTaskInput) => Promise<void>;
+    editTask: (input: UpdateTaskInput) => Promise<Error | null>;
+    removeTask: (input: DeleteTaskInput) => Promise<void>;
     // ドラッグ中の見た目のカラム移動専用。supabaseへは送らない
     moveTaskStatus: (id: string, status: TaskStatus) => void;
 };
@@ -106,7 +92,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
             console.error(errorMessages.taskDeleteFailed, error);
         }
     },
-    
+
     moveTaskStatus: (id, status) => {
         set((state) => ({
             tasks: state.tasks.map((task) =>
