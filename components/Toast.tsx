@@ -1,11 +1,10 @@
 "use client"
 
 import { useEffect } from "react";
-import { useTaskStore } from "@/store/taskStore"
-import { ToastItem, ToastStatus } from "@/store/taskStore";
+import { ToastItem, ToastStatus, useToastStore } from "@/store/toastStore"
 
 function ToastItemView( { item }: { item: ToastItem }) {
-    const closeToast = useTaskStore((state) => state.closeToast);
+    const closeToast = useToastStore((state) => state.closeToast);
 
     useEffect(() => {
         const timer = setTimeout(() => closeToast(item.id), 5000);
@@ -28,7 +27,7 @@ const statusTone: Record<ToastStatus, string> = {
 }
 
 export function Toast() {
-    const toastItems = useTaskStore((state) => state.toastItems);
+    const toastItems = useToastStore((state) => state.toastItems);
 
     return (
         <div className="fixed top-6 left-1/2 z-50 flex flex-col gap-2 -translate-x-1/2">

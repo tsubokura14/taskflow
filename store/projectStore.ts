@@ -1,15 +1,20 @@
 import { create } from "zustand";
 import { Project } from "@/types";
-import * as projectApi from "@/lib/projects";
+import { CreateProjectInput, projectApi } from "@/lib/projects";
 
-type projectStore = {
+type ProjectStore = {
+    // --- プロジェクト一覧画面 ---
     projects: Project[];
     fetchProjects: (workspaceId: string) => Promise<void>;
+    addProject: (input: CreateProjectInput) => Promise<void>;
+
+    // --- プロジェクト一覧の配下の画面 ---
     currentProjectId: string | null;
     setCurrentProjectId: (projectId: string | null) => void;
 }
 
-export const useProjectStore = create<projectStore>((set) => ({
+export const useProjectStore = create<ProjectStore>((set) => ({
+    // --- プロジェクト一覧画面 ---
     projects: [],
 
     fetchProjects: async (workspaceId) => {
@@ -21,6 +26,16 @@ export const useProjectStore = create<projectStore>((set) => ({
         }
     },
 
+    addProject: async (input) => {
+        try {
+            const newProject = await projectApi.createProject(input);
+            set((state) => ({ projects: [ ...state.projects, newProject ] }));
+        } catch (error) {
+            console.error(error);
+        }
+    },
+
+    // --- プロジェクト一覧の配下の画面 ---
     currentProjectId: null,
 
     setCurrentProjectId: (projectId) => set({ currentProjectId: projectId })

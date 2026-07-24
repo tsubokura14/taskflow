@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect } from "react";
+import { useToastStore } from "@/store/toastStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
-import { useTaskStore } from "@/store/taskStore";
 import { toastMessages } from "@/lib/messages";
 import { TextLink } from "@/components/TextLink";
 
@@ -10,7 +10,7 @@ import { TextLink } from "@/components/TextLink";
 const workspaceIds: string[] = [ "001", "002", "003" ];
 
 export default function WorkspacesPage() {
-    const openToast = useTaskStore((state) => state.openToast)
+    const openToast = useToastStore((state) => state.openToast)
     const workspaces = useWorkspaceStore((state) => state.workspaces);
     const fetchWorkspaces = useWorkspaceStore((state) => state.fetchWorkspaces);
 
