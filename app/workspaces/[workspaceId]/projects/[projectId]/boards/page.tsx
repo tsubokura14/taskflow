@@ -145,10 +145,10 @@ export default function KanbanBoard({ params }: Props) {
         priority: "low",
         assigneeIds: [],
         createdBy: "user_001",
-        updatedBy: null,
+        updatedBy: "user_001",
         version: 1,
         createdAt: "",
-        updatedAt: null,
+        updatedAt: "",
     };
 
     const sensors = useSensors(

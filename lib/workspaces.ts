@@ -22,11 +22,11 @@ export type WorkspaceRow = {
     id: string,
     name: string,
     version: number,
-    createdBy: string,
-    updatedBy: string | null,
-    createdAt: string,
-    updatedAt: string | null,
-    deletedAt: string | null
+    created_by: string,
+    updated_by: string,
+    created_at: string,
+    updated_at: string,
+    deleted_at: string | null
 }
 
 /** 
@@ -46,10 +46,10 @@ function rowToWorkspace(row: WorkspaceRow): Workspace {
         id: row.id,
         name: row.name,
         version: row.version,
-        createdBy: row.createdBy,
-        updatedBy: row.updatedBy,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt
+        createdBy: row.created_by,
+        updatedBy: row.updated_by,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
     }
 }
 
@@ -62,7 +62,7 @@ const stubWorkspaceApi = {
         const idSet = new Set(workspaceIds);
         return workspaces
             .filter((row) => idSet.has(row.id))
-            .filter((row) => row.deletedAt === null)
+            .filter((row) => row.deleted_at === null)
             .map(rowToWorkspace);
     },
 
@@ -71,11 +71,11 @@ const stubWorkspaceApi = {
             id: crypto.randomUUID(),
             name: input.name,
             version: 1,
-            createdBy: input.loginUser,
-            updatedBy: null,
-            createdAt: getCurrentDate(),
-            updatedAt: null,
-            deletedAt: null
+            created_by: input.loginUser,
+            updated_by: input.loginUser,
+            created_at: getCurrentDate(),
+            updated_at: getCurrentDate(),
+            deleted_at: null
         }
 
         workspaces = [...workspaces, newWorkspace]; 
@@ -94,8 +94,8 @@ const stubWorkspaceApi = {
             ...target,
             name: input.name,
             version: target.version + 1,
-            updatedBy: input.loginUser,
-            updatedAt: getCurrentDate(),
+            updated_by: input.loginUser,
+            updated_at: getCurrentDate(),
         };
 
         workspaces = workspaces
@@ -114,8 +114,8 @@ const stubWorkspaceApi = {
         const newWorkspace: WorkspaceRow =  {
             ...target,
             version: target.version + 1,
-            updatedBy: input.loginUser,
-            deletedAt: getCurrentDate(),
+            updated_by: input.loginUser,
+            deleted_at: getCurrentDate(),
         };
 
         workspaces = workspaces

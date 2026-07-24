@@ -34,10 +34,10 @@ type TaskRow = {
     priority: Task["priority"];
     assignee_ids: string[];
     created_by: string;
-    updated_by: string | null;
+    updated_by: string;
     version: number;
     created_at: string;
-    updated_at: string | null;
+    updated_at: string;
     deleted_at: string | null;
 };
 

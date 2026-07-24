@@ -7,40 +7,40 @@ export const projectFixtures: ProjectRow[] = [
         workspaceId: "001",
         name: "サンプルプロジェクト001",
         version: 1,
-        createdBy: "user001",
-        updatedBy: "user001",
-        createdAt: "20260701",
-        updatedAt: "20260701",
-        deletedAt: null
+        created_by: "user001",
+        updated_by: "user001",
+        created_at: "20260701",
+        updated_at: "20260701",
+        deleted_at: null
     }, {
         id: "002",
         workspaceId: "002",
         name: "サンプルプロジェクト002",
         version: 1,
-        createdBy: "user001",
-        updatedBy: "user001",
-        createdAt: "20260701",
-        updatedAt: "20260701",
-        deletedAt: null
+        created_by: "user001",
+        updated_by: "user001",
+        created_at: "20260701",
+        updated_at: "20260701",
+        deleted_at: null
     }, {
         id: "003",
         workspaceId: "003",
         name: "サンプルプロジェクト003",
         version: 1,
-        createdBy: "user001",
-        updatedBy: "user001",
-        createdAt: "20260701",
-        updatedAt: "20260701",
-        deletedAt: null
+        created_by: "user001",
+        updated_by: "user001",
+        created_at: "20260701",
+        updated_at: "20260701",
+        deleted_at: null
     }, {
         id: "004",
         workspaceId: "003",
         name: "サンプルプロジェクト004",
         version: 1,
-        createdBy: "user001",
-        updatedBy: "user001",
-        createdAt: "20260701",
-        updatedAt: "20260701",
-        deletedAt: "20260701"
+        created_by: "user001",
+        updated_by: "user001",
+        created_at: "20260701",
+        updated_at: "20260701",
+        deleted_at: "20260701"
     }
 ]

@@ -24,11 +24,11 @@ export type ProjectRow = {
     workspaceId: string,
     name: string,
     version: number,
-    createdBy: string,
-    updatedBy: string | null,
-    createdAt: string,
-    updatedAt: string | null,
-    deletedAt: string | null
+    created_by: string,
+    updated_by: string,
+    created_at: string,
+    updated_at: string,
+    deleted_at: string | null
 }
 
 /** 
@@ -49,10 +49,10 @@ function rowToProject(row: ProjectRow): Project {
         workspaceId: row.workspaceId,
         name: row.name,
         version: row.version,
-        createdBy: row.createdBy,
-        updatedBy: row.updatedBy,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt
+        createdBy: row.created_by,
+        updatedBy: row.updated_by,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
     }
 }
 
@@ -65,7 +65,7 @@ const stubProjectApi = {
         const data = projects;
         return (data)
             .filter((row) => row.workspaceId === workspaceId)
-            .filter((row) => row.deletedAt === null)
+            .filter((row) => row.deleted_at === null)
             .map(rowToProject);
     },
 
@@ -75,11 +75,11 @@ const stubProjectApi = {
             workspaceId: input.workspaceId,
             name: input.name,
             version: 1,
-            createdBy: input.loginUser,
-            updatedBy: null,
-            createdAt: getCurrentDate(),
-            updatedAt: null,
-            deletedAt: null
+            created_by: input.loginUser,
+            updated_by: input.loginUser,
+            created_at: getCurrentDate(),
+            updated_at: getCurrentDate(),
+            deleted_at: null
         }
         projects = [...projects, newProject]; 
         return rowToProject(newProject);
@@ -96,8 +96,8 @@ const stubProjectApi = {
             ...target,
             name: input.name,
             version: target.version + 1,
-            updatedBy: input.loginUser,
-            updatedAt: getCurrentDate(),
+            updated_by: input.loginUser,
+            updated_at: getCurrentDate(),
         };
 
         projects = projects
@@ -116,8 +116,8 @@ const stubProjectApi = {
         const newProject: ProjectRow =  {
             ...target,
             version: target.version + 1,
-            updatedBy: input.loginUser,
-            deletedAt: getCurrentDate(),
+            updated_by: input.loginUser,
+            deleted_at: getCurrentDate(),
         };
 
         projects = projects

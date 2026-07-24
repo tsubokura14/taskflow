@@ -3,9 +3,9 @@ export type Workspace = {
     name: string,
     version: number,
     createdBy: string,
-    updatedBy: string | null,
+    updatedBy: string,
     createdAt: string,
-    updatedAt: string | null
+    updatedAt: string
 };
 
 export type Project = {
@@ -14,9 +14,9 @@ export type Project = {
     name: string,
     version: number,
     createdBy: string,
-    updatedBy: string | null,
+    updatedBy: string,
     createdAt: string,
-    updatedAt: string | null
+    updatedAt: string
 };
 
 export type TaskStatus = "todo" | "in_progress" | "done";
@@ -30,8 +30,8 @@ export type Task = {
     priority: TaskPriority;
     assigneeIds: string[]; // タスクの担当者
     createdBy: string;
-    updatedBy: string | null;
+    updatedBy: string;
     version: number;
     createdAt: string;
-    updatedAt: string | null;
+    updatedAt: string;
 };
