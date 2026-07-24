@@ -29,9 +29,9 @@ const columns: { status: TaskStatus; label: string }[] = [
 ];
 
 const columnTone: Record<TaskStatus, { bg: string; heading: string }> = {
-    todo: { bg: "bg-todo-bg", heading: "text-todo-text" },
-    in_progress: { bg: "bg-progress-bg", heading: "text-progress-text" },
-    done: { bg: "bg-done-bg", heading: "text-done-text" },
+    todo: { bg: "bg-slate-50", heading: "text-slate-600" },
+    in_progress: { bg: "bg-blue-50", heading: "text-blue-700" },
+    done: { bg: "bg-green-50", heading: "text-green-700" },
 };
 
 /**
@@ -105,7 +105,7 @@ function KanbanColumn({
     return (
         <div
             ref={setNodeRef}
-            className={`rounded-xl border border-border p-3 transition-colors ${columnTone[status].bg} ${isOver ? "ring-2 ring-primary" : ""}`}
+            className={`rounded-xl border border-slate-200 p-3 transition-colors ${columnTone[status].bg} ${isOver ? "ring-2 ring-blue-600" : ""}`}
         >
             <h2 className={`mb-3 text-sm font-semibold ${columnTone[status].heading}`}>{label}</h2>
 
@@ -260,7 +260,7 @@ export default function KanbanBoard({ params }: Props) {
             {canCreateTask() && (
                 <button
                     onClick={() => setEditingTask(newTask)}
-                    className="mb-4 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+                    className="mb-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600/90"
                 >
                     + タスクを作成
                 </button>

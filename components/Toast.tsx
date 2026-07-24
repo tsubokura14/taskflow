@@ -12,7 +12,7 @@ function ToastItemView( { item }: { item: ToastItem }) {
     }, [item.id, closeToast]);
 
     return (
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface-elevated px-4 py-3 text-sm font-medium text-text shadow-xl">
+        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 shadow-xl">
             <span className={`h-2 w-2 shrink-0 rounded-full ${statusTone[item.status]}`} />
             {item.text}
         </div>
@@ -20,10 +20,10 @@ function ToastItemView( { item }: { item: ToastItem }) {
 }
 
 const statusTone: Record<ToastStatus, string> = {
-    success: "bg-success",
-    error: "bg-danger",
-    warning: "bg-warning",
-    info: "bg-info"
+    success: "bg-green-600",
+    error: "bg-red-600",
+    warning: "bg-amber-600",
+    info: "bg-blue-600"
 }
 
 export function Toast() {

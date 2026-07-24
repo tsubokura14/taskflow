@@ -13,9 +13,9 @@ const priorityLabel: Record<Task["priority"], string> = {
 };
 
 const priorityTone: Record<Task["priority"], string> = {
-    low: "text-priority-low",
-    medium: "text-priority-medium",
-    high: "text-priority-high",
+    low: "text-slate-500",
+    medium: "text-amber-600",
+    high: "text-red-600",
 };
 
 type ChildProps = {
@@ -59,10 +59,10 @@ export function TaskCard({ task, setEditingTask }: ChildProps) {
             style={style}
             {...attributes}
             {...listeners} 
-            className="touch-none rounded-xl border border-border bg-surface-elevated p-3 shadow-sm transition-shadow hover:shadow-md"
+            className="touch-none rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
         >
-            <p className="text-sm font-semibold text-text leading-snug">{task.title}</p>
-            <div className="mt-2 flex items-center justify-between text-xs text-text-muted">
+            <p className="text-sm font-semibold text-slate-900 leading-snug">{task.title}</p>
+            <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
                 <span>担当： {task.assigneeIds[0] ?? "未割当"}</span>
                 <span className={`font-semibold ${priorityTone[task.priority]}`}>優先度： {priorityLabel[task.priority]}</span>
             </div>
@@ -72,7 +72,7 @@ export function TaskCard({ task, setEditingTask }: ChildProps) {
                         // ボタンが押下されることで、ドラッグ開始として親に伝播することを阻止する
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={() => setEditingTask(task)}
-                        className="text-info hover:underline"
+                        className="text-blue-600 hover:underline"
                     >
                         編集
                     </button>
@@ -82,7 +82,7 @@ export function TaskCard({ task, setEditingTask }: ChildProps) {
                         // ボタンが押下されることで、ドラッグ開始として親に伝播することを阻止する
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={handleDelete}
-                        className="text-danger hover:underline"
+                        className="text-red-600 hover:underline"
                     >
                         削除
                     </button>
