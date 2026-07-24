@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Workspace } from "@/types";
-import { canCreateWorkspace } from "@/lib/permissions";
+import { canCreateWorkspace, canEditWorkspace } from "@/lib/permissions";
 import { useToastStore } from "@/store/toastStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
 import { WorkspaceForm } from "@/components/WorkspaceForm";
@@ -13,8 +13,8 @@ import { TextLink } from "@/components/TextLink";
 const workspaceIds: string[] = [ "001", "002", "003" ];
 
 export default function WorkspacesPage() {
-    const openToast = useToastStore((state) => state.openToast)
     const workspaces = useWorkspaceStore((state) => state.workspaces);
+    const openToast = useToastStore((state) => state.openToast)
     const fetchWorkspaces = useWorkspaceStore((state) => state.fetchWorkspaces);
 
     // 新規・編集フォーム
@@ -34,12 +34,6 @@ export default function WorkspacesPage() {
         fetchWorkspaces(workspaceIds);
     }, [fetchWorkspaces]);
 
-    function handleDevelopingClick(): void {
-        openToast([
-            { status: "error", text: toastMessages.developing }
-        ])
-    }
-
     return (
         <div className="flex flex-col items-center min-h-screen p-8 bg-gray-50">
             <div className="flex justify-between w-full">
@@ -58,13 +52,13 @@ export default function WorkspacesPage() {
                         <TextLink href={`/workspaces/${workspace.id}/projects`}>
                             <button>{workspace.name}</button>
                         </TextLink>
-                        {/* <Link href="/workspaces/${workspace.id}/settings"> */}
+                        {canEditWorkspace() && (
                             <button
-                                onClick={() => handleDevelopingClick()}
+                                onClick={() => setEditingWorkspace(workspace)}
                             >
                                 設定
                             </button>
-                        {/* </Link> */}
+                        )}
                     </div>
                 ))}
             </div>

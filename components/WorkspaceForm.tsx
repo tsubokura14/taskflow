@@ -15,6 +15,7 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
     const openToast = useToastStore((state) => state.openToast);
     const addWorkspace = useWorkspaceStore((state) => state.addWorkspace);
     const editWorkspace = useWorkspaceStore((state) => state.editWorkspace);
+    const deleteWorkspace = useWorkspaceStore((state) => state.removeWorkspace);
 
     const [name, setName] = useState(editingWorkspace?.name ?? "");
 
@@ -33,7 +34,6 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
             await addWorkspace({ 
                 name, 
                 loginUser: "user_001"});
-        
         // 編集
         } else {
             await editWorkspace({
@@ -42,6 +42,14 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
                 loginUser: "user_001"
             });
         }
+        setEditingWorkspace(null);
+    }
+
+    async function handleDelete() {
+        await deleteWorkspace({
+            workspaceId: workspace.id,
+            loginUser: "user_001"
+        });
         setEditingWorkspace(null);
     }
 
@@ -65,7 +73,7 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
                     />
                 </label>
 
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-2 mb-3">
                     <button
                         type="button"
                         onClick={() => setEditingWorkspace(null)}
@@ -80,6 +88,18 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
                         保存
                     </button>
                 </div>
+
+                {workspace.id !== "" && (
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            onClick={() => handleDelete()}
+                            className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+                        >
+                            削除
+                        </button>
+                    </div>
+                )}
             </form>
         </div>
     );
