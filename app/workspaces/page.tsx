@@ -1,8 +1,11 @@
 "use client"
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Workspace } from "@/types";
+import { canCreateWorkspace } from "@/lib/permissions";
 import { useToastStore } from "@/store/toastStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
+import { WorkspaceForm } from "@/components/WorkspaceForm";
 import { toastMessages } from "@/lib/messages";
 import { TextLink } from "@/components/TextLink";
 
@@ -13,6 +16,19 @@ export default function WorkspacesPage() {
     const openToast = useToastStore((state) => state.openToast)
     const workspaces = useWorkspaceStore((state) => state.workspaces);
     const fetchWorkspaces = useWorkspaceStore((state) => state.fetchWorkspaces);
+
+    // 新規・編集フォーム
+    const [ editingWorkspace, setEditingWorkspace ] = useState<Workspace | null>(null);
+
+    const newWorkspace: Workspace = {
+        id: "",
+        name: "",
+        version: 1,
+        createdBy: "",
+        updatedBy: "",
+        createdAt: "",
+        updatedAt: "",
+    };
 
     useEffect(() => {
         fetchWorkspaces(workspaceIds);
@@ -27,14 +43,14 @@ export default function WorkspacesPage() {
     return (
         <div className="flex flex-col items-center min-h-screen p-8 bg-gray-50">
             <div className="flex justify-between w-full">
-                {/* <Link href="/workspaces/new" > */}
+                {canCreateWorkspace() && (
                     <button
-                        onClick={() => handleDevelopingClick()}
+                        onClick={() => setEditingWorkspace(newWorkspace)}
                         className="mb-4 w-24 border border-gray-300 rounded-lg py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                     >
                         作成
                     </button>
-                {/* </Link> */}
+                )}
             </div>
             <div className="grid grid-cols-3 gap-2 w-full">
                 {workspaces.map((workspace) => (
@@ -52,6 +68,8 @@ export default function WorkspacesPage() {
                     </div>
                 ))}
             </div>
+
+            {editingWorkspace && <WorkspaceForm editingWorkspace={editingWorkspace} setEditingWorkspace={setEditingWorkspace} />}
         </div>
     )
 }

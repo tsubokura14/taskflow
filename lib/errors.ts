@@ -28,6 +28,10 @@ export class TaskNotFoundError extends Error {
 
 export const errorMessages = {
     commonError: "エラーが発生しました。",
+    workspaceFetchFailed:  "ワークスペースの取得に失敗しました。",
+    workspaceCreateFailed: "ワークスペースの作成に失敗しました。",
+    workspaceUpdateFailed: "ワークスペースの更新に失敗しました。",
+    workspaceDeleteFailed: "ワークスペースの削除に失敗しました。",
     projectFetchFailed:  "プロジェクトの取得に失敗しました。",
     projectCreateFailed: "プロジェクトの作成に失敗しました。",
     projectUpdateFailed: "プロジェクトの更新に失敗しました。",
