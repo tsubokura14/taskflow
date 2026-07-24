@@ -7,22 +7,23 @@ import {
     projectApi } from "@/lib/projects";
 
 type ProjectStore = {
-    // --- プロジェクト一覧画面 ---
     projects: Project[];
+
+    // --- DB操作 ---
     fetchProjects: (workspaceId: string) => Promise<void>;
     addProject: (input: CreateProjectInput) => Promise<void>;
     editProject: (input: UpdateProjectInput) => Promise<void>;
     removeProject: (input: DeleteProjectInput) => Promise<void>;
 
-    // --- プロジェクト一覧の配下の画面 ---
+    // --- 画面情報 ---
     currentProjectId: string | null;
     setCurrentProjectId: (projectId: string | null) => void;
 }
 
 export const useProjectStore = create<ProjectStore>((set) => ({
-    // --- プロジェクト一覧画面 ---
     projects: [],
 
+    // --- DB操作 ---
     fetchProjects: async (workspaceId) => {
         try {
             const projects = await projectApi.getProjects(workspaceId);
@@ -65,7 +66,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         }
     },
 
-    // --- プロジェクト一覧の配下の画面 ---
+    // --- 画面情報 ---
     currentProjectId: null,
 
     setCurrentProjectId: (projectId) => set({ currentProjectId: projectId })
