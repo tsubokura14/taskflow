@@ -4,9 +4,7 @@ import { useState, useEffect, use } from "react";
 import { TextLink } from "@/components/TextLink";
 import { canCreateProject, canEditProject } from "@/lib/permissions";
 import { Project } from "@/types";
-import { useToastStore } from "@/store/toastStore";
 import { useProjectStore } from "@/store/projectStore";
-import { toastMessages } from "@/lib/messages";
 import { ProjectForm } from "@/components/ProjectForm";
 
 type Props = {
@@ -17,7 +15,6 @@ export default function ProjectsPage({ params }: Props) {
     const { workspaceId } = use(params);
     const projects = useProjectStore((state) => state.projects);
     const fetchProjects = useProjectStore((state) => state.fetchProjects);
-    const openToast = useToastStore((state) => state.openToast)
 
     // 新規・編集フォーム
     const [ editingProject, setEditingProject ] = useState<Project | null>(null);

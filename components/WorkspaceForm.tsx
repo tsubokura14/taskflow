@@ -92,7 +92,7 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
                 {workspace.id !== "" && (
                     <div className="flex justify-end">
                         <button
-                            type="submit"
+                            type="button"
                             onClick={() => handleDelete()}
                             className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
                         >

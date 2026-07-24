@@ -3,10 +3,8 @@
 import { useState, useEffect } from "react";
 import { Workspace } from "@/types";
 import { canCreateWorkspace, canEditWorkspace } from "@/lib/permissions";
-import { useToastStore } from "@/store/toastStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
 import { WorkspaceForm } from "@/components/WorkspaceForm";
-import { toastMessages } from "@/lib/messages";
 import { TextLink } from "@/components/TextLink";
 
 // 未実装。ユーザーとワークスペース、権限の中間テーブルから取得するのが正。
@@ -14,7 +12,6 @@ const workspaceIds: string[] = [ "001", "002", "003" ];
 
 export default function WorkspacesPage() {
     const workspaces = useWorkspaceStore((state) => state.workspaces);
-    const openToast = useToastStore((state) => state.openToast)
     const fetchWorkspaces = useWorkspaceStore((state) => state.fetchWorkspaces);
 
     // 新規・編集フォーム
