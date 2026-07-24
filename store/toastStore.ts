@@ -18,7 +18,7 @@ type ToastStore = {
 }
 
 // Adapter
-export const useToastStore = create<ToastStore> ((set, get) => ({
+export const useToastStore = create<ToastStore> ((set) => ({
     toastItems: [],
 
     openToast: (items: ToastInput[]) => {

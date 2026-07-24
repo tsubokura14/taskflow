@@ -18,8 +18,12 @@ const priorityTone: Record<Task["priority"], string> = {
     high: "text-priority-high",
 };
 
-export function TaskCard({ task }: { task: Task }) {
-    const openEditForm = useTaskStore((state) => state.openEditForm);
+type ChildProps = {
+    task: Task;
+    setEditingTask: React.Dispatch<React.SetStateAction<Task | null>>;
+};
+
+export function TaskCard({ task, setEditingTask }: ChildProps) {
     const removeTask = useTaskStore((state) => state.removeTask);
 
     // attributes: role・aria-roledescription・aria-disabled・tabIndex などのアクセシビリティ用属性一式
@@ -41,7 +45,11 @@ export function TaskCard({ task }: { task: Task }) {
 
     function handleDelete() {
         if (window.confirm(`「${task.title}」を削除しますか？`)) {
-            removeTask(task.id);
+            removeTask({
+                id: task.id,
+                currentVersion: task.version,
+                loginUser: "user_001"
+            });
         }
     }
 
@@ -63,7 +71,7 @@ export function TaskCard({ task }: { task: Task }) {
                     <button 
                         // ボタンが押下されることで、ドラッグ開始として親に伝播することを阻止する
                         onPointerDown={(e) => e.stopPropagation()}
-                        onClick={() => openEditForm(task.id)}
+                        onClick={() => setEditingTask(task)}
                         className="text-info hover:underline"
                     >
                         編集

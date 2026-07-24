@@ -1,42 +1,39 @@
 import { create } from "zustand";
 import { Task, TaskStatus } from "@/types";
-import * as taskApi from "@/lib/tasks";
+import { 
+    CreateTaskInput,
+    UpdateTaskInput,
+    DeleteTaskInput,
+    taskApi 
+} from "@/lib/tasks";
 import { 
     errorMessages,
     CommonError
 } from "@/lib/errors";
 
-export type ToastItem = {
-    id: string;
-    status: ToastStatus;
-    text: string;
-}
-export type ToastStatus = "success" | "error" | "warning" | "info";
-type ToastInput = Omit<ToastItem, "id">;
-
 type TaskStore = {
     // --- サーバー状態（supabaseのデータキャッシュ） --- 
     tasks: Task[];
     fetchTasks: (projectId: string) => Promise<void>;
-    addTask: (input: { projectId: string, title: string; priority: Task["priority"] }) => Promise<void>;
-    editTask: (
+    addTask: (input: { 
+        projectId: string, 
+        title: string; 
+        priority: Task["priority"],
+        loginUser: string }
+    ) => Promise<void>;
+    editTask: (input: {
         id: string,
-        change: Partial<Pick<Task, "title" | "status" | "priority">>
+        changes: Partial<Pick<Task, "title" | "status" | "priority">>,
+        currentVersion: number,
+        loginUser: string}
     ) => Promise<Error | null>;
-    removeTask: (id: string) => Promise<void>;
+    removeTask: (input: {
+        id: string,
+        currentVersion: number,
+        loginUser: string
+    }) => Promise<void>;
     // ドラッグ中の見た目のカラム移動専用。supabaseへは送らない
     moveTaskStatus: (id: string, status: TaskStatus) => void;
-
-    // --- UIの一時状態 ---
-    isFormOpen: boolean;
-    editingTaskId: string | null;
-    openCreateForm: () => void;
-    openEditForm: (taskId: string) => void;
-    closeForm: () => void;
-
-    toastItems: ToastItem[];
-    openToast: (items: ToastInput[]) => void;
-    closeToast: (id: string) => void;
 };
 
 /**
@@ -73,7 +70,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         }
     },
 
-    addTask: async (input) => {
+    addTask: async (input: CreateTaskInput) => {
         try {
             const newTask = await taskApi.createTask(input);
             set((state) => ({ tasks: [...state.tasks, newTask] }));
@@ -82,17 +79,17 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         }
     },
 
-    editTask: async (id, change) => {
-        const current = get().tasks.find((task) => task.id === id);
+    editTask: async (input: UpdateTaskInput) => {
+        const current = get().tasks.find((task) => task.id === input.id);
         if (!current) {
             console.error(errorMessages.taskUpdateFailed);
             return new CommonError();
         };
         try {
             // 楽観的排他制御を行うため、現在のバージョンを引き渡す
-            const update = await taskApi.updateTask(id, change, current.version);
+            const update = await taskApi.updateTask(input);
             set((state) => ({
-                tasks: state.tasks.map((task) => (task.id === id ? update : task)),
+                tasks: state.tasks.map((task) => (task.id === input.id ? update : task)),
             }));
         } catch (error) {
             console.error(errorMessages.taskUpdateFailed, error);
@@ -101,10 +98,10 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
         return null;
     },
 
-    removeTask: async (id) => {
+    removeTask: async (input: DeleteTaskInput) => {
         try {
-            await taskApi.deleteTask(id);
-            set((state) => ({ tasks: state.tasks.filter((task) => task.id !== id ) }));
+            await taskApi.deleteTask(input);
+            set((state) => ({ tasks: state.tasks.filter((task) => task.id !== input.id ) }));
         } catch (error) {
             console.error(errorMessages.taskDeleteFailed, error);
         }
@@ -117,31 +114,4 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
             )
         }));
     },
-
-    isFormOpen: false,
-    editingTaskId: null,
-
-    openCreateForm: () => {
-        set({ isFormOpen: true, editingTaskId: null });
-    },
-
-    openEditForm: (taskId) => {
-        set({ isFormOpen: true, editingTaskId: taskId });
-    },
-
-    closeForm: () => {
-        set({ isFormOpen: false, editingTaskId: null });
-    },
-
-    toastItems: [],
-
-    openToast: (items: ToastInput[]) => {
-        const newItems = items.map((item) => ({ id: crypto.randomUUID(), ...item }));
-        set((state) => ({ toastItems: [...state.toastItems, ...newItems]}));
-    },
-
-    closeToast: (id) => {
-        set((state) => ({ toastItems: state.toastItems.filter((item) => item.id !== id) }));
-    }
-
 }));

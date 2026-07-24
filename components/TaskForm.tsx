@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import React, { useState, Dispatch, FormEvent } from "react";
 import { useToastStore } from "@/store/toastStore";
 import { useTaskStore } from "@/store/taskStore";
 import { Task } from "@/types";
@@ -8,30 +8,48 @@ import { errorMessages } from "@/lib/errors";
 import { toastMessages } from "@/lib/messages";
 import { useProjectStore } from "@/store/projectStore";
 
-export function TaskForm() {
-    const isFormOpen = useTaskStore((state) => state.isFormOpen);
-    const editingTaskId = useTaskStore((state) => state.editingTaskId);
-    const tasks = useTaskStore((state) => state.tasks);
+type ChildProps = {
+    editingTask: Task | null; 
+    setEditingTask: Dispatch<React.SetStateAction<Task | null>>;
+};
+
+export function TaskForm({ editingTask, setEditingTask }: ChildProps) {
+    const openToast = useToastStore((state) => state.openToast);
+    const currentProjectId = useProjectStore((state) => state.currentProjectId);
     const fetchTasks = useTaskStore((state) => state.fetchTasks);
     const addTask = useTaskStore((state) => state.addTask);
     const editTask = useTaskStore((state) => state.editTask);
-    const closeForm = useTaskStore((state) => state.closeForm);
-    const openToast = useToastStore((state) => state.openToast);
-    const currentProjectId = useProjectStore((state) => state.currentProjectId);
-    
-    const editingTask = tasks.find((task) => task.id === editingTaskId);
 
     const [title, setTitle] = useState(editingTask?.title ?? "");
     const [priority, setPriority] = useState<Task["priority"]>(editingTask?.priority ?? "medium");
 
-    if (!isFormOpen) return null;
+    if (!editingTask) return null;
+    const task: Task = editingTask;
 
     async function handleSubmit(e: FormEvent) {
         e.preventDefault();
-        if (!title.trim()) return;
+        if (!title.trim() || !currentProjectId) {
+            openToast([{ status: "error", text: errorMessages.taskUpdateFailed }]);
+            return;
+        }
 
-        if (editingTask) {
-            const result: Error | null = await editTask(editingTask.id, { title, priority });
+        // 新規作成
+        if (task.id === "") {
+            await addTask({ 
+                projectId: currentProjectId, 
+                title, 
+                priority, 
+                loginUser: "user_001"});
+        
+        // 編集
+        } else {
+            const result: Error | null = await editTask({
+                id: task.id,
+                changes: { title, priority },
+                currentVersion: task.version,
+                loginUser: "user_001"
+            });
+            
             // 更新に失敗した場合
             if (result) {
                 openToast([
@@ -43,14 +61,8 @@ export function TaskForm() {
                     openToast([{ status: "info", text: toastMessages.syncRecentData }]);
                 }
             }
-        } else {
-            if (currentProjectId) {
-                addTask({ projectId: currentProjectId, title, priority });
-            } else {
-                openToast([{ status: "error", text: toastMessages.commonError }]);
-            }
         }
-        closeForm();
+        setEditingTask(null);
     }
 
     return (
@@ -60,7 +72,7 @@ export function TaskForm() {
                 className="w-96 rounded-2xl bg-surface-elevated p-6 shadow-xl"
             >
                 <h2 className="mb-4 text-base font-bold text-text">
-                    {editingTask ? "タスクを編集" : "タスクを作成"}
+                    {task.id === "" ? "タスクを作成" : "タスクを編集"}
                 </h2>
 
                 <label className="mb-3 block text-xs font-semibold text-text-muted">
@@ -89,7 +101,7 @@ export function TaskForm() {
                 <div className="flex justify-end gap-2">
                     <button
                         type="button"
-                        onClick={closeForm}
+                        onClick={() => setEditingTask(null)}
                         className="rounded-lg px-4 py-2 text-sm font-semibold text-text-muted transition hover:bg-surface-sunken"
                     >
                         キャンセル
