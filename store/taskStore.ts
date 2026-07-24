@@ -106,7 +106,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
             console.error(errorMessages.taskDeleteFailed, error);
         }
     },
-
+    
     moveTaskStatus: (id, status) => {
         set((state) => ({
             tasks: state.tasks.map((task) =>
