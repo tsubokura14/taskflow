@@ -6,7 +6,7 @@ export type Workspace = {
     updatedBy: string | null,
     createdAt: string,
     updatedAt: string | null
-}
+};
 
 export type Project = {
     id: string,
@@ -17,7 +17,7 @@ export type Project = {
     updatedBy: string | null,
     createdAt: string,
     updatedAt: string | null
-}
+};
 
 export type TaskStatus = "todo" | "in_progress" | "done";
 export type TaskPriority = "low" | "medium" | "high";
@@ -34,4 +34,4 @@ export type Task = {
     version: number;
     createdAt: string;
     updatedAt: string | null;
-}
+};
