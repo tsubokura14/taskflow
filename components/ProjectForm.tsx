@@ -13,11 +13,11 @@ type ChildProps = {
 };
 
 export function ProjectForm({ editingProject, setEditingProject }: ChildProps) {
-    const openToast = useToastStore((state) => state.openToast);
-
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const openToast = useToastStore((state) => state.openToast);
     const addProject = useProjectStore((state) => state.addProject);
     const editProject = useProjectStore((state) => state.editProject);
+    const deleteProject = useProjectStore((state) => state.removeProject);
 
     const [name, setName] = useState(editingProject?.name ?? "");
 
@@ -37,7 +37,6 @@ export function ProjectForm({ editingProject, setEditingProject }: ChildProps) {
                 workspaceId: currentWorkspaceId, 
                 name, 
                 loginUser: "user_001"});
-        
         // 編集
         } else {
             await editProject({
@@ -46,6 +45,14 @@ export function ProjectForm({ editingProject, setEditingProject }: ChildProps) {
                 loginUser: "user_001"
             });
         }
+        setEditingProject(null);
+    }
+
+    async function handleDelete() {
+        await deleteProject({
+            projectId: project.id,
+            loginUser: "user_001"
+        });
         setEditingProject(null);
     }
 
@@ -69,7 +76,7 @@ export function ProjectForm({ editingProject, setEditingProject }: ChildProps) {
                     />
                 </label>
 
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-2 mb-3">
                     <button
                         type="button"
                         onClick={() => setEditingProject(null)}
@@ -84,6 +91,18 @@ export function ProjectForm({ editingProject, setEditingProject }: ChildProps) {
                         保存
                     </button>
                 </div>
+
+                {project.id !== "" && (
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            onClick={() => handleDelete()}
+                            className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+                        >
+                            削除
+                        </button>
+                    </div>
+                )}
             </form>
         </div>
     );

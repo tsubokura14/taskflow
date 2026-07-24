@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import { TextLink } from "@/components/TextLink";
-import { canCreateProject } from "@/lib/permissions";
+import { canCreateProject, canEditProject } from "@/lib/permissions";
 import { Project } from "@/types";
 import { useToastStore } from "@/store/toastStore";
 import { useProjectStore } from "@/store/projectStore";
@@ -37,12 +37,6 @@ export default function ProjectsPage({ params }: Props) {
         fetchProjects(workspaceId);
     }, [fetchProjects, workspaceId]);
 
-    function handleDevelopingClick(): void {
-        openToast([
-            { status: "error", text: toastMessages.developing }
-        ])
-    }
-
     return (
         <div className="flex flex-col items-center min-h-screen p-8 bg-gray-50">
             <div className="flex justify-between w-full">
@@ -61,13 +55,13 @@ export default function ProjectsPage({ params }: Props) {
                         <TextLink href={`/workspaces/${project.workspaceId}/projects/${project.id}/boards`}>
                             <button>{project.name}</button>
                         </TextLink>
-                        {/* <Link href="/workspaces/projects/settings"> */}
+                        {canEditProject() && (
                             <button
-                                onClick={() => handleDevelopingClick()}
+                                onClick={() => setEditingProject(project)}
                             >
                                 設定
                             </button>
-                        {/* </Link> */}
+                        )}
                     </div>
                 ))}
             </div>
