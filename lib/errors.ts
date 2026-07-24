@@ -28,6 +28,10 @@ export class TaskNotFoundError extends Error {
 
 export const errorMessages = {
     commonError: "エラーが発生しました。",
+    projectFetchFailed:  "プロジェクトの取得に失敗しました。",
+    projectCreateFailed: "プロジェクトの作成に失敗しました。",
+    projectUpdateFailed: "プロジェクトの更新に失敗しました。",
+    projectDeleteFailed: "プロジェクトの削除に失敗しました。",
     taskFetchFailed:  "タスクの取得に失敗しました。",
     taskCreateFailed: "タスクの作成に失敗しました。",
     taskUpdateFailed: "タスクの更新に失敗しました。",

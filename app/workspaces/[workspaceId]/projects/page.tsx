@@ -1,10 +1,13 @@
 "use client"
 
-import { useEffect, use } from "react";
+import { useState, useEffect, use } from "react";
 import { TextLink } from "@/components/TextLink";
+import { canCreateProject } from "@/lib/permissions";
+import { Project } from "@/types";
 import { useToastStore } from "@/store/toastStore";
 import { useProjectStore } from "@/store/projectStore";
 import { toastMessages } from "@/lib/messages";
+import { ProjectForm } from "@/components/ProjectForm";
 
 type Props = {
     params: Promise<{ workspaceId: string }>
@@ -15,6 +18,20 @@ export default function ProjectsPage({ params }: Props) {
     const projects = useProjectStore((state) => state.projects);
     const fetchProjects = useProjectStore((state) => state.fetchProjects);
     const openToast = useToastStore((state) => state.openToast)
+
+    // 新規・編集フォーム
+    const [ editingProject, setEditingProject ] = useState<Project | null>(null);
+
+    const newProject: Project = {
+        id: "",
+        workspaceId: workspaceId,
+        name: "",
+        version: 1,
+        createdBy: "",
+        updatedBy: "",
+        createdAt: "",
+        updatedAt: "",
+    };
 
     useEffect(() => {
         fetchProjects(workspaceId);
@@ -29,14 +46,14 @@ export default function ProjectsPage({ params }: Props) {
     return (
         <div className="flex flex-col items-center min-h-screen p-8 bg-gray-50">
             <div className="flex justify-between w-full">
-                {/* <Link href={`/workspaces/projects/new`}> */}
+                {canCreateProject() && (
                     <button
-                        onClick={() => handleDevelopingClick()}
+                        onClick={() => setEditingProject(newProject)}
                         className="mb-4 w-24 border border-gray-300 rounded-lg py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                     >
                         作成
                     </button>
-                {/* </Link> */}
+                )}
             </div>
             <div className="grid grid-cols-3 gap-2 w-full">
                 {projects.map((project) => (
@@ -54,6 +71,8 @@ export default function ProjectsPage({ params }: Props) {
                     </div>
                 ))}
             </div>
+
+            {editingProject && <ProjectForm editingProject={editingProject} setEditingProject={setEditingProject} />}
         </div>
     )
 }
