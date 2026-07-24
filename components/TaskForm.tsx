@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { useToastStore } from "@/store/toastStore";
 import { useTaskStore } from "@/store/taskStore";
 import { Task } from "@/types";
 import { errorMessages } from "@/lib/errors";
@@ -15,7 +16,7 @@ export function TaskForm() {
     const addTask = useTaskStore((state) => state.addTask);
     const editTask = useTaskStore((state) => state.editTask);
     const closeForm = useTaskStore((state) => state.closeForm);
-    const openToast = useTaskStore((state) => state.openToast);
+    const openToast = useToastStore((state) => state.openToast);
     const currentProjectId = useProjectStore((state) => state.currentProjectId);
     
     const editingTask = tasks.find((task) => task.id === editingTaskId);

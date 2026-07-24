@@ -14,6 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { canCreateTask, canEditTask } from "@/lib/permissions"
+import { useToastStore } from "@/store/toastStore";
 import { toastMessages } from "@/lib/messages";
 import { useTaskStore } from "@/store/taskStore";
 import { Task, TaskStatus } from "@/types";
@@ -131,7 +132,7 @@ export default function KanbanBoard({ params }: Props) {
     const openCreateForm = useTaskStore((state) => state.openCreateForm);
     const editTask = useTaskStore((state) => state.editTask);
     const moveTaskStatus = useTaskStore((state) => state.moveTaskStatus);
-    const openToast = useTaskStore((state) => state.openToast);
+    const openToast = useToastStore((state) => state.openToast);
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 8 } })

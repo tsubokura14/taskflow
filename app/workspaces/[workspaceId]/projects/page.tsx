@@ -2,8 +2,8 @@
 
 import { useEffect, use } from "react";
 import { TextLink } from "@/components/TextLink";
+import { useToastStore } from "@/store/toastStore";
 import { useProjectStore } from "@/store/projectStore";
-import { useTaskStore } from "@/store/taskStore";
 import { toastMessages } from "@/lib/messages";
 
 type Props = {
@@ -14,7 +14,7 @@ export default function ProjectsPage({ params }: Props) {
     const { workspaceId } = use(params);
     const projects = useProjectStore((state) => state.projects);
     const fetchProjects = useProjectStore((state) => state.fetchProjects);
-    const openToast = useTaskStore((state) => state.openToast)
+    const openToast = useToastStore((state) => state.openToast)
 
     useEffect(() => {
         fetchProjects(workspaceId);
