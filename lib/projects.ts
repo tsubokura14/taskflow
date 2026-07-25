@@ -2,7 +2,7 @@ import { Project } from "@/types"
 import { getCurrentDate } from "@/lib/utils";
 import { projectFixtures } from "@/lib/projects.fixtures";
 import { supabase } from './supabaseClient';
-import { ProjectDbError } from "@/lib/errors";
+import { ProjectDbError, ProjectNotFoundError } from "@/lib/errors";
 
 // --- ports ---
 export type CreateProjectInput = {
@@ -100,6 +100,7 @@ const supabaseProjectApi = {
             .select(); // updateした行をそのまま返却させる。
         
         if (error) throw new ProjectDbError(error);
+        if (data.length === 0) throw new ProjectNotFoundError();
 
         return rowToProject(data[0] as ProjectRow)
     },

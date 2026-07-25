@@ -12,6 +12,20 @@ export class WorkspaceDbError extends Error {
     }
 }
 
+export class WorkspaceConflictError extends Error {
+    constructor(cause?: unknown) {
+        super("ワークスペースの操作が競合しました。", { cause });
+        this.name = "WorkspaceConflictError";
+    }
+}
+
+export class WorkspaceNotFoundError extends Error {
+    constructor(cause?: unknown) {
+        super("対象のワークスペースが見つかりませんでした。", { cause });
+        this.name = "WorkspaceNotFoundError";
+    }
+}
+
 export class ProjectDbError extends Error {
     constructor(cause?: unknown) {
         super("DB操作でエラーが発生しました。", { cause });

@@ -2,7 +2,7 @@ import { Workspace } from "@/types"
 import { workspaceFixtures } from "@/lib/workspaces.fixtures"
 import { getCurrentDate } from "@/lib/utils"
 import { supabase } from "@/lib/supabaseClient"
-import { WorkspaceDbError } from "@/lib/errors"
+import { WorkspaceDbError, WorkspaceNotFoundError } from "@/lib/errors"
 
 // --- ports ---
 export type CreateWorkspaceInput = {
@@ -96,6 +96,8 @@ const supabaseWorkspaceApi = {
             .select(); // updateした行をそのまま返却させる。
 
         if (error) throw new WorkspaceDbError(error);
+        if (data.length === 0) throw new WorkspaceNotFoundError();
+
         return rowToWorkspace(data[0] as WorkspaceRow);
     },
 
