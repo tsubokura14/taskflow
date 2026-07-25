@@ -17,6 +17,7 @@ import { canCreateTask, canEditTask } from "@/lib/permissions"
 import { useToastStore } from "@/store/toastStore";
 import { toastMessages } from "@/lib/messages";
 import { useTaskStore } from "@/store/taskStore";
+import { useUserStore } from "@/store/userStore";
 import { Task, TaskStatus } from "@/types";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskForm } from "@/components/TaskForm";
@@ -133,6 +134,7 @@ export default function KanbanBoard({ params }: Props) {
     const fetchTasks = useTaskStore((state) => state.fetchTasks);
     const editTask = useTaskStore((state) => state.editTask);
     const moveTaskStatus = useTaskStore((state) => state.moveTaskStatus);
+    const currentUser = useUserStore((state) => state.currentUser);
 
     // 新規・編集フォーム
     const [ editingTask, setEditingTask ] = useState<Task | null>(null);
@@ -144,8 +146,8 @@ export default function KanbanBoard({ params }: Props) {
         status: "todo",
         priority: "low",
         assigneeIds: [],
-        createdBy: "user_001",
-        updatedBy: "user_001",
+        createdBy: currentUser?.id ?? "",
+        updatedBy: currentUser?.id ?? "",
         version: 1,
         createdAt: "",
         updatedAt: "",
@@ -219,16 +221,24 @@ export default function KanbanBoard({ params }: Props) {
         // over: ドロップされた時点で下に重なっていた要素
         const { active, over } = event;
 
-        if (!over) return;
-
         const activeTask = tasks.find((task) => task.id === active.id);
+        const startedFrom = dragStartStatusRef.current;
+
+        if (!over) {
+            // カラム外にドロップされた場合、handleDragOverで先に反映した
+            // ローカルstateをドラッグ開始時のステータスへ戻す
+            if (activeTask && startedFrom) {
+                moveTaskStatus(activeTask.id, startedFrom);
+            }
+            dragStartStatusRef.current = null;
+            return;
+        }
+
         if (!activeTask) return;
         
         // 重なっていたのがカラムかカードかに関わらず、そのステータスを取得する
         const newStatus = resolveNewStatus(String(over.id), tasks);
         
-        const startedFrom = dragStartStatusRef.current;
-
         // ドラッグ開始時のステータスとドロップ時のステータスが異なる場合
         if (newStatus && startedFrom && newStatus !== startedFrom) {
             // ドラッグ&ドロップした要素のステータスを変更
@@ -236,7 +246,7 @@ export default function KanbanBoard({ params }: Props) {
                     id: activeTask.id,
                     changes: { status: newStatus },
                     currentVersion: activeTask.version,
-                    loginUser: "user_001"
+                    loginUser: currentUser?.id ?? ""
                 });
   
             // 更新に失敗した場合

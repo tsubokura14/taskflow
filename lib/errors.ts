@@ -5,6 +5,48 @@ export class CommonError extends Error {
     }
 }
 
+export class WorkspaceDbError extends Error {
+    constructor(cause?: unknown) {
+        super("DB操作でエラーが発生しました。", { cause });
+        this.name = "WorkspaceDbError";
+    }
+}
+
+export class WorkspaceConflictError extends Error {
+    constructor(cause?: unknown) {
+        super("ワークスペースの操作が競合しました。", { cause });
+        this.name = "WorkspaceConflictError";
+    }
+}
+
+export class WorkspaceNotFoundError extends Error {
+    constructor(cause?: unknown) {
+        super("対象のワークスペースが見つかりませんでした。", { cause });
+        this.name = "WorkspaceNotFoundError";
+    }
+}
+
+export class ProjectDbError extends Error {
+    constructor(cause?: unknown) {
+        super("DB操作でエラーが発生しました。", { cause });
+        this.name = "ProjectDbError";
+    }
+}
+
+export class ProjectConflictError extends Error {
+    constructor(cause?: unknown) {
+        super("プロジェクトの操作が競合しました。", { cause });
+        this.name = "ProjectConflictError";
+    }
+}
+
+export class ProjectNotFoundError extends Error {
+    constructor(cause?: unknown) {
+        super("対象のプロジェクトが見つかりませんでした。", { cause });
+        this.name = "ProjectNotFoundError";
+    }
+}
+
 export class TaskDbError extends Error {
     constructor(cause?: unknown) {
         super("DB操作でエラーが発生しました。", { cause });

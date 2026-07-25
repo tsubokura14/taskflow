@@ -4,16 +4,18 @@ import React, { useState, Dispatch, FormEvent } from "react";
 import { useToastStore } from "@/store/toastStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
 import { useProjectStore } from "@/store/projectStore";
+import { useUserStore } from "@/store/userStore";
 import { Project } from "@/types";
 import { errorMessages } from "@/lib/errors";
 
 type ChildProps = {
-    editingProject: Project | null; 
+    editingProject: Project | null;
     setEditingProject: Dispatch<React.SetStateAction<Project | null>>;
 };
 
 export function ProjectForm({ editingProject, setEditingProject }: ChildProps) {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const currentUser = useUserStore((state) => state.currentUser);
     const openToast = useToastStore((state) => state.openToast);
     const addProject = useProjectStore((state) => state.addProject);
     const editProject = useProjectStore((state) => state.editProject);
@@ -33,16 +35,16 @@ export function ProjectForm({ editingProject, setEditingProject }: ChildProps) {
 
         // 新規作成
         if (project.id === "") {
-            await addProject({ 
-                workspaceId: currentWorkspaceId, 
-                name, 
-                loginUser: "user_001"});
+            await addProject({
+                workspaceId: currentWorkspaceId,
+                name,
+                loginUser: currentUser?.id ?? ""});
         // 編集
         } else {
             await editProject({
                 projectId: project.id,
                 name,
-                loginUser: "user_001"
+                loginUser: currentUser?.id ?? ""
             });
         }
         setEditingProject(null);
@@ -51,7 +53,7 @@ export function ProjectForm({ editingProject, setEditingProject }: ChildProps) {
     async function handleDelete() {
         await deleteProject({
             projectId: project.id,
-            loginUser: "user_001"
+            loginUser: currentUser?.id ?? ""
         });
         setEditingProject(null);
     }

@@ -1,6 +1,8 @@
 import { Workspace } from "@/types"
 import { workspaceFixtures } from "@/lib/workspaces.fixtures"
 import { getCurrentDate } from "@/lib/utils"
+import { supabase } from "@/lib/supabaseClient"
+import { WorkspaceDbError, WorkspaceNotFoundError } from "@/lib/errors"
 
 // --- ports ---
 export type CreateWorkspaceInput = {
@@ -52,6 +54,66 @@ function rowToWorkspace(row: WorkspaceRow): Workspace {
         updatedAt: row.updated_at
     }
 }
+
+// --- 本番環境・Adapters ---
+const supabaseWorkspaceApi = {
+    getWorkspaces: async (workspaceIds: string[]) => {
+        const { data, error } = await supabase
+            .from("workspace")
+            .select("*")
+            .in("id", workspaceIds)
+            .is("deleted_at", null)
+            .order("created_at", { ascending: true });
+
+        if (error) throw new WorkspaceDbError(error);
+        return (data as WorkspaceRow[]).map(rowToWorkspace);
+    },
+
+    createWorkspace: async (input: CreateWorkspaceInput) => {
+        const { data, error } = await supabase
+            .from("workspace")
+            .insert({
+                name: input.name,
+                created_by: input.loginUser,
+                updated_by: input.loginUser,
+            })
+            .select() // insertした行をそのまま返却させる。
+            .single(); // 返却する形式に単一オブジェクト{...}を指定する。
+
+        if (error) throw new WorkspaceDbError(error);
+        return rowToWorkspace(data as WorkspaceRow);
+    },
+
+    updateWorkspace: async (input: UpdateWorkspaceInput) => {
+        const { data, error } = await supabase
+            .from("workspace")
+            .update({
+                name: input.name,
+                updated_by: input.loginUser,
+                updated_at: new Date().toISOString(),
+            })
+            .eq("id", input.workspaceId)
+            .select(); // updateした行をそのまま返却させる。
+
+        if (error) throw new WorkspaceDbError(error);
+        if (data.length === 0) throw new WorkspaceNotFoundError();
+
+        return rowToWorkspace(data[0] as WorkspaceRow);
+    },
+
+    deleteWorkspace: async (input: DeleteWorkspaceInput) => {
+        const { error } = await supabase
+            .from("workspace")
+            .update({
+                updated_by: input.loginUser,
+                deleted_at: new Date().toISOString(),
+            })
+            .eq("id", input.workspaceId)
+            .select(); // updateした行をそのまま返却させる。
+
+        if (error) throw new WorkspaceDbError(error);
+    }
+} satisfies WorkspaceApi;
 
 // スタブ使用時の暫定的な永続化先（再代入により模擬的にDBの役割を果たす）
 let workspaces: WorkspaceRow[] = workspaceFixtures;
@@ -125,4 +187,5 @@ const stubWorkspaceApi = {
 
 // 本番環境とスタブの切り替え点
 // ストアには中身が本番かスタブかを意識させない
-export const workspaceApi = stubWorkspaceApi;
+// export const workspaceApi = stubWorkspaceApi;
+export const workspaceApi = supabaseWorkspaceApi;

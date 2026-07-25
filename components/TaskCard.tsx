@@ -4,7 +4,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
 import { Task } from "@/types";
 import { useTaskStore } from "@/store/taskStore";
-import { canEditTask, canDeleteTask } from "@/lib/permissions" 
+import { useUserStore } from "@/store/userStore";
+import { canEditTask, canDeleteTask } from "@/lib/permissions"
 
 const priorityLabel: Record<Task["priority"], string> = {
     low: "低",
@@ -25,6 +26,7 @@ type ChildProps = {
 
 export function TaskCard({ task, setEditingTask }: ChildProps) {
     const removeTask = useTaskStore((state) => state.removeTask);
+    const currentUser = useUserStore((state) => state.currentUser);
 
     // attributes: role・aria-roledescription・aria-disabled・tabIndex などのアクセシビリティ用属性一式
     // listeners: ドラッグ開始を検知するイベントハンドラ一式
@@ -48,7 +50,7 @@ export function TaskCard({ task, setEditingTask }: ChildProps) {
             removeTask({
                 id: task.id,
                 currentVersion: task.version,
-                loginUser: "user_001"
+                loginUser: currentUser?.id ?? ""
             });
         }
     }
