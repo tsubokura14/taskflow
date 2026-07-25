@@ -219,16 +219,24 @@ export default function KanbanBoard({ params }: Props) {
         // over: ドロップされた時点で下に重なっていた要素
         const { active, over } = event;
 
-        if (!over) return;
-
         const activeTask = tasks.find((task) => task.id === active.id);
+        const startedFrom = dragStartStatusRef.current;
+
+        if (!over) {
+            // カラム外にドロップされた場合、handleDragOverで先に反映した
+            // ローカルstateをドラッグ開始時のステータスへ戻す
+            if (activeTask && startedFrom) {
+                moveTaskStatus(activeTask.id, startedFrom);
+            }
+            dragStartStatusRef.current = null;
+            return;
+        }
+
         if (!activeTask) return;
         
         // 重なっていたのがカラムかカードかに関わらず、そのステータスを取得する
         const newStatus = resolveNewStatus(String(over.id), tasks);
         
-        const startedFrom = dragStartStatusRef.current;
-
         // ドラッグ開始時のステータスとドロップ時のステータスが異なる場合
         if (newStatus && startedFrom && newStatus !== startedFrom) {
             // ドラッグ&ドロップした要素のステータスを変更
