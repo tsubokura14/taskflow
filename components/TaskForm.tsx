@@ -7,14 +7,16 @@ import { Task } from "@/types";
 import { errorMessages } from "@/lib/errors";
 import { toastMessages } from "@/lib/messages";
 import { useProjectStore } from "@/store/projectStore";
+import { useUserStore } from "@/store/userStore";
 
 type ChildProps = {
-    editingTask: Task | null; 
+    editingTask: Task | null;
     setEditingTask: Dispatch<React.SetStateAction<Task | null>>;
 };
 
 export function TaskForm({ editingTask, setEditingTask }: ChildProps) {
     const openToast = useToastStore((state) => state.openToast);
+    const currentUser = useUserStore((state) => state.currentUser);
     const currentProjectId = useProjectStore((state) => state.currentProjectId);
     const fetchTasks = useTaskStore((state) => state.fetchTasks);
     const addTask = useTaskStore((state) => state.addTask);
@@ -35,11 +37,11 @@ export function TaskForm({ editingTask, setEditingTask }: ChildProps) {
 
         // 新規作成
         if (task.id === "") {
-            await addTask({ 
-                projectId: currentProjectId, 
-                title, 
-                priority, 
-                loginUser: "user_001"});
+            await addTask({
+                projectId: currentProjectId,
+                title,
+                priority,
+                loginUser: currentUser?.id ?? ""});
         
         // 編集
         } else {
@@ -47,7 +49,7 @@ export function TaskForm({ editingTask, setEditingTask }: ChildProps) {
                 id: task.id,
                 changes: { title, priority },
                 currentVersion: task.version,
-                loginUser: "user_001"
+                loginUser: currentUser?.id ?? ""
             });
             
             // 更新に失敗した場合

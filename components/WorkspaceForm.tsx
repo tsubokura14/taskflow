@@ -3,16 +3,18 @@
 import React, { useState, Dispatch, FormEvent } from "react";
 import { useToastStore } from "@/store/toastStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
+import { useUserStore } from "@/store/userStore";
 import { Workspace } from "@/types";
 import { errorMessages } from "@/lib/errors";
 
 type ChildProps = {
-    editingWorkspace: Workspace | null; 
+    editingWorkspace: Workspace | null;
     setEditingWorkspace: Dispatch<React.SetStateAction<Workspace | null>>;
 };
 
 export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildProps) {
     const openToast = useToastStore((state) => state.openToast);
+    const currentUser = useUserStore((state) => state.currentUser);
     const addWorkspace = useWorkspaceStore((state) => state.addWorkspace);
     const editWorkspace = useWorkspaceStore((state) => state.editWorkspace);
     const deleteWorkspace = useWorkspaceStore((state) => state.removeWorkspace);
@@ -31,15 +33,15 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
 
         // 新規作成
         if (workspace.id === "") {
-            await addWorkspace({ 
-                name, 
-                loginUser: "user_001"});
+            await addWorkspace({
+                name,
+                loginUser: currentUser?.id ?? ""});
         // 編集
         } else {
             await editWorkspace({
                 workspaceId: workspace.id,
                 name,
-                loginUser: "user_001"
+                loginUser: currentUser?.id ?? ""
             });
         }
         setEditingWorkspace(null);
@@ -48,7 +50,7 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
     async function handleDelete() {
         await deleteWorkspace({
             workspaceId: workspace.id,
-            loginUser: "user_001"
+            loginUser: currentUser?.id ?? ""
         });
         setEditingWorkspace(null);
     }
