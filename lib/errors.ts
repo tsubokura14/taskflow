@@ -5,6 +5,27 @@ export class CommonError extends Error {
     }
 }
 
+export class ProjectDbError extends Error {
+    constructor(cause?: unknown) {
+        super("DB操作でエラーが発生しました。", { cause });
+        this.name = "ProjectDbError";
+    }
+}
+
+export class ProjectConflictError extends Error {
+    constructor(cause?: unknown) {
+        super("プロジェクトの操作が競合しました。", { cause });
+        this.name = "ProjectConflictError";
+    }
+}
+
+export class ProjectNotFoundError extends Error {
+    constructor(cause?: unknown) {
+        super("対象のプロジェクトが見つかりませんでした。", { cause });
+        this.name = "ProjectNotFoundError";
+    }
+}
+
 export class TaskDbError extends Error {
     constructor(cause?: unknown) {
         super("DB操作でエラーが発生しました。", { cause });

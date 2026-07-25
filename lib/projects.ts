@@ -1,6 +1,8 @@
 import { Project } from "@/types"
 import { getCurrentDate } from "@/lib/utils";
 import { projectFixtures } from "@/lib/projects.fixtures";
+import { supabase } from './supabaseClient';
+import { ProjectDbError, TaskDbError } from "@/lib/errors";
 
 // --- ports ---
 export type CreateProjectInput = {
@@ -55,6 +57,67 @@ function rowToProject(row: ProjectRow): Project {
         updatedAt: row.updated_at
     }
 }
+
+// --- 本番環境・Adapters ---
+const supabaseProjectApi = {
+    getProjects: async (workspaceId: string) => {
+        const { data, error } = await supabase
+        .from("project")
+        .select("*")
+        .eq("workspace_id", workspaceId)
+        .is("deleted_at", null)
+        .order("created_at", { ascending: true });
+
+        if (error) throw new ProjectDbError(error);
+        return (data as ProjectRow[]).map(rowToProject);
+    },
+
+    createProject: async (input: CreateProjectInput) => {
+        const { data, error } = await supabase
+            .from("project")
+            .insert({
+                workspace_id: input.workspaceId,
+                name: input.name,
+                created_by: input.loginUser,
+                updated_by: input.loginUser,
+            })
+            .select() // insertした行をそのまま返却させる。
+            .single(); // 返却する形式に単一オブジェクト{...}を指定する。
+
+        if (error) throw new TaskDbError(error);
+        return rowToProject(data as ProjectRow);
+    },
+    
+    updateProject: async (input: UpdateProjectInput) => {
+        const { data, error } = await supabase
+            .from("project")
+            .update({
+                name: input.name,
+                updated_by: input.loginUser,
+                updated_at: new Date().toISOString(),
+            })
+            .eq("id", input.projectId)
+            .select(); // updateした行をそのまま返却させる。
+        
+        if (error) throw new ProjectDbError;
+
+        return rowToProject(data[0] as ProjectRow)
+    },
+
+    deleteProject: async (input: DeleteProjectInput) => {
+        const { error } = await supabase
+            .from("project")
+            .update({
+                updated_by: input.loginUser,
+                deleted_at: new Date().toISOString(),
+            })
+            .eq("id", input.projectId)
+            .select(); // updateした行をそのまま返却させる。
+        
+        if (error) throw new ProjectDbError;
+
+    }
+} satisfies ProjectApi;
 
 // スタブ使用時の暫定的な永続化先（再代入により模擬的にDBの役割を果たす）
 let projects: ProjectRow[] = projectFixtures;
@@ -127,4 +190,5 @@ const stubProjectApi = {
 
 // 本番環境とスタブの切り替え点
 // ストアには中身が本番かスタブかを意識させない
-export const projectApi = stubProjectApi;
+// export const projectApi = stubProjectApi;
+export const projectApi = supabaseProjectApi;
