@@ -21,7 +21,7 @@ export type DeleteProjectInput = {
 /** DBから受け取る型 */
 export type ProjectRow = {
     id: string,
-    workspaceId: string,
+    workspace_id: string,
     name: string,
     version: number,
     created_by: string,
@@ -46,7 +46,7 @@ export type ProjectApi = {
 function rowToProject(row: ProjectRow): Project {
     return {
         id: row.id,
-        workspaceId: row.workspaceId,
+        workspaceId: row.workspace_id,
         name: row.name,
         version: row.version,
         createdBy: row.created_by,
@@ -64,7 +64,7 @@ const stubProjectApi = {
     getProjects: async (workspaceId: string) => {
         const data = projects;
         return (data)
-            .filter((row) => row.workspaceId === workspaceId)
+            .filter((row) => row.workspace_id === workspaceId)
             .filter((row) => row.deleted_at === null)
             .map(rowToProject);
     },
@@ -72,7 +72,7 @@ const stubProjectApi = {
     createProject: async (input: CreateProjectInput) => {
         const newProject: ProjectRow = {
             id: crypto.randomUUID(),
-            workspaceId: input.workspaceId,
+            workspace_id: input.workspaceId,
             name: input.name,
             version: 1,
             created_by: input.loginUser,

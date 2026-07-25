@@ -4,7 +4,7 @@ import { ProjectRow } from "@/lib/projects"
 export const projectFixtures: ProjectRow[] = [
     {
         id: "001",
-        workspaceId: "001",
+        workspace_id: "001",
         name: "サンプルプロジェクト001",
         version: 1,
         created_by: "user001",
@@ -14,7 +14,7 @@ export const projectFixtures: ProjectRow[] = [
         deleted_at: null
     }, {
         id: "002",
-        workspaceId: "002",
+        workspace_id: "002",
         name: "サンプルプロジェクト002",
         version: 1,
         created_by: "user001",
@@ -24,7 +24,7 @@ export const projectFixtures: ProjectRow[] = [
         deleted_at: null
     }, {
         id: "003",
-        workspaceId: "003",
+        workspace_id: "003",
         name: "サンプルプロジェクト003",
         version: 1,
         created_by: "user001",
@@ -34,7 +34,7 @@ export const projectFixtures: ProjectRow[] = [
         deleted_at: null
     }, {
         id: "004",
-        workspaceId: "003",
+        workspace_id: "003",
         name: "サンプルプロジェクト004",
         version: 1,
         created_by: "user001",
