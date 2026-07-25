@@ -5,6 +5,13 @@ export class CommonError extends Error {
     }
 }
 
+export class WorkspaceDbError extends Error {
+    constructor(cause?: unknown) {
+        super("DB操作でエラーが発生しました。", { cause });
+        this.name = "WorkspaceDbError";
+    }
+}
+
 export class ProjectDbError extends Error {
     constructor(cause?: unknown) {
         super("DB操作でエラーが発生しました。", { cause });
