@@ -2,7 +2,7 @@ import { Project } from "@/types"
 import { getCurrentDate } from "@/lib/utils";
 import { projectFixtures } from "@/lib/projects.fixtures";
 import { supabase } from './supabaseClient';
-import { ProjectDbError, TaskDbError } from "@/lib/errors";
+import { ProjectDbError } from "@/lib/errors";
 
 // --- ports ---
 export type CreateProjectInput = {
@@ -84,7 +84,7 @@ const supabaseProjectApi = {
             .select() // insertした行をそのまま返却させる。
             .single(); // 返却する形式に単一オブジェクト{...}を指定する。
 
-        if (error) throw new TaskDbError(error);
+        if (error) throw new ProjectDbError(error);
         return rowToProject(data as ProjectRow);
     },
     
@@ -99,7 +99,7 @@ const supabaseProjectApi = {
             .eq("id", input.projectId)
             .select(); // updateした行をそのまま返却させる。
         
-        if (error) throw new ProjectDbError;
+        if (error) throw new ProjectDbError(error);
 
         return rowToProject(data[0] as ProjectRow)
     },
@@ -114,7 +114,7 @@ const supabaseProjectApi = {
             .eq("id", input.projectId)
             .select(); // updateした行をそのまま返却させる。
         
-        if (error) throw new ProjectDbError;
+        if (error) throw new ProjectDbError(error);
 
     }
 } satisfies ProjectApi;
