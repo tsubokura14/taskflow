@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, use} from "react";
+import { useState, useEffect, useMemo, useRef, use} from "react";
 import {
     DndContext,
     DragEndEvent,
@@ -14,6 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { canCreateTask, canEditTask } from "@/lib/permissions"
+import { useToastStore } from "@/store/toastStore";
 import { toastMessages } from "@/lib/messages";
 import { useTaskStore } from "@/store/taskStore";
 import { Task, TaskStatus } from "@/types";
@@ -28,9 +29,9 @@ const columns: { status: TaskStatus; label: string }[] = [
 ];
 
 const columnTone: Record<TaskStatus, { bg: string; heading: string }> = {
-    todo: { bg: "bg-todo-bg", heading: "text-todo-text" },
-    in_progress: { bg: "bg-progress-bg", heading: "text-progress-text" },
-    done: { bg: "bg-done-bg", heading: "text-done-text" },
+    todo: { bg: "bg-slate-50", heading: "text-slate-600" },
+    in_progress: { bg: "bg-blue-50", heading: "text-blue-700" },
+    done: { bg: "bg-green-50", heading: "text-green-700" },
 };
 
 /**
@@ -88,10 +89,12 @@ function KanbanColumn({
     status,
     label,
     tasks,
+    setEditingTask
 }: {
     status: TaskStatus;
     label: string;
     tasks: Task[];
+    setEditingTask: React.Dispatch<React.SetStateAction<Task | null>>;
 }) {
     // setNodeRef：要素を「ドロップ先」として登録する
     // isOver：ドラッグ中のオブジェクトが上に重なっているかどうか
@@ -102,7 +105,7 @@ function KanbanColumn({
     return (
         <div
             ref={setNodeRef}
-            className={`rounded-xl border border-border p-3 transition-colors ${columnTone[status].bg} ${isOver ? "ring-2 ring-primary" : ""}`}
+            className={`rounded-xl border border-slate-200 p-3 transition-colors ${columnTone[status].bg} ${isOver ? "ring-2 ring-blue-600" : ""}`}
         >
             <h2 className={`mb-3 text-sm font-semibold ${columnTone[status].heading}`}>{label}</h2>
 
@@ -111,7 +114,7 @@ function KanbanColumn({
             <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
                 <div className="flex min-h-10 flex-col gap-2">
                     {tasks.map((task) => (
-                        <TaskCard key={task.id} task={task} />
+                        <TaskCard key={task.id} task={task} setEditingTask={setEditingTask} />
                     ))}
                 </div>
             </SortableContext>
@@ -125,13 +128,28 @@ type Props = {
 
 export default function KanbanBoard({ params }: Props) {
     const { projectId } = use(params)
+    const openToast = useToastStore((state) => state.openToast);
     const tasks = useTaskStore((state) => state.tasks);
-    const isFormOpen = useTaskStore((state) => state.isFormOpen);
     const fetchTasks = useTaskStore((state) => state.fetchTasks);
-    const openCreateForm = useTaskStore((state) => state.openCreateForm);
     const editTask = useTaskStore((state) => state.editTask);
     const moveTaskStatus = useTaskStore((state) => state.moveTaskStatus);
-    const openToast = useTaskStore((state) => state.openToast);
+
+    // 新規・編集フォーム
+    const [ editingTask, setEditingTask ] = useState<Task | null>(null);
+
+    const newTask: Task = {
+        id: "",
+        projectId: projectId,
+        title: "",
+        status: "todo",
+        priority: "low",
+        assigneeIds: [],
+        createdBy: "user_001",
+        updatedBy: "user_001",
+        version: 1,
+        createdAt: "",
+        updatedAt: "",
+    };
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -214,7 +232,13 @@ export default function KanbanBoard({ params }: Props) {
         // ドラッグ開始時のステータスとドロップ時のステータスが異なる場合
         if (newStatus && startedFrom && newStatus !== startedFrom) {
             // ドラッグ&ドロップした要素のステータスを変更
-            const result: Error | null = await editTask(activeTask.id, { status: newStatus });
+            const result: Error | null = await editTask({
+                    id: activeTask.id,
+                    changes: { status: newStatus },
+                    currentVersion: activeTask.version,
+                    loginUser: "user_001"
+                });
+  
             // 更新に失敗した場合
             if (result) {
                 openToast([
@@ -235,8 +259,8 @@ export default function KanbanBoard({ params }: Props) {
 
             {canCreateTask() && (
                 <button
-                    onClick={openCreateForm}
-                    className="mb-4 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+                    onClick={() => setEditingTask(newTask)}
+                    className="mb-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600/90"
                 >
                     + タスクを作成
                 </button>
@@ -254,12 +278,13 @@ export default function KanbanBoard({ params }: Props) {
                             status={column.status}
                             label={column.label}
                             tasks={tasks.filter((task) => task.status === column.status)}
+                            setEditingTask={setEditingTask}
                         />
                     ))}
                 </div>
             </DndContext>
 
-            {isFormOpen && <TaskForm />}
+            {editingTask && <TaskForm editingTask={editingTask} setEditingTask={setEditingTask} />}
         </div>
     );
 }

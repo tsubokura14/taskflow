@@ -1,70 +1,128 @@
 import { Workspace } from "@/types"
+import { workspaceFixtures } from "@/lib/workspaces.fixtures"
+import { getCurrentDate } from "@/lib/utils"
 
+// --- ports ---
+export type CreateWorkspaceInput = {
+    name: string;
+    loginUser: string;
+}
+export type UpdateWorkspaceInput = {
+    workspaceId: string;
+    name: string;
+    loginUser: string;
+}
+export type DeleteWorkspaceInput = {
+    workspaceId: string;
+    loginUser: string;
+}
+
+// DBから受け取る型
 export type WorkspaceRow = {
     id: string,
     name: string,
     version: number,
-    createdBy: string,
-    updatedBy: string,
-    createdAt: string,
-    updatedAt: string,
-    deletedAt: string | null
+    created_by: string,
+    updated_by: string,
+    created_at: string,
+    updated_at: string,
+    deleted_at: string | null
 }
 
+/** 
+ * ストアとDB/スタブの受け渡しに使用
+ * DBとスタブの不整合を防ぐ役割
+ */
+export type WorkspaceApi = {
+    getWorkspaces: (workspaceIds: string[]) => Promise<Workspace[]>;
+    createWorkspace: (input: CreateWorkspaceInput) => Promise<Workspace>;
+    updateWorkspace: (input: UpdateWorkspaceInput) => Promise<Workspace>;
+    deleteWorkspace: (input: DeleteWorkspaceInput) => Promise<void>;
+};
+
+// Mapper
 function rowToWorkspace(row: WorkspaceRow): Workspace {
     return {
         id: row.id,
         name: row.name,
         version: row.version,
-        createdBy: row.createdBy,
-        updatedBy: row.updatedBy,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt
+        createdBy: row.created_by,
+        updatedBy: row.updated_by,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
     }
 }
 
-// export async function getWorkspace(): Promise<Workspace[]> {
-//     const { data, error } = await supabase
-//         .from("workspace")
-//         .select("*");
-//     if (error) throw new Error();
-//     return (data as WorkspaceRow[]).map(rowToWorkspace);
-// }
+// スタブ使用時の暫定的な永続化先（再代入により模擬的にDBの役割を果たす）
+let workspaces: WorkspaceRow[] = workspaceFixtures;
 
-// スタブ
-export function getWorkspaces(workspaceIds: string[]): Workspace[] {
-    const data: WorkspaceRow[] = [
-        {
-            id: "001",
-            name: "サンプルワークスペース001",
+// --- スタブ・Adapters ---
+const stubWorkspaceApi = {
+    getWorkspaces: async (workspaceIds: string[]) => {
+        const idSet = new Set(workspaceIds);
+        return workspaces
+            .filter((row) => idSet.has(row.id))
+            .filter((row) => row.deleted_at === null)
+            .map(rowToWorkspace);
+    },
+
+    createWorkspace: async (input: CreateWorkspaceInput) => {
+        const newWorkspace: WorkspaceRow = {
+            id: crypto.randomUUID(),
+            name: input.name,
             version: 1,
-            createdBy: "user001",
-            updatedBy: "user001",
-            createdAt: "20260701",
-            updatedAt: "20260701",
-            deletedAt: null
-        }, {
-            id: "002",
-            name: "サンプルワークスペース002",
-            version: 1,
-            createdBy: "user002",
-            updatedBy: "user002",
-            createdAt: "20260701",
-            updatedAt: "20260701",
-            deletedAt: "20260701"
-        }, {
-            id: "003",
-            name: "サンプルワークスペース003",
-            version: 1,
-            createdBy: "user003",
-            updatedBy: "user003",
-            createdAt: "20260701",
-            updatedAt: "20260701",
-            deletedAt: "20260701"
+            created_by: input.loginUser,
+            updated_by: input.loginUser,
+            created_at: getCurrentDate(),
+            updated_at: getCurrentDate(),
+            deleted_at: null
         }
-    ]
-    return (data as WorkspaceRow[])
-        .filter((row) => workspaceIds.includes(row.id))
-        .filter((row) => row.deletedAt === null)
-        .map(rowToWorkspace);
-}
+
+        workspaces = [...workspaces, newWorkspace]; 
+
+        return rowToWorkspace(newWorkspace);
+    },
+
+    updateWorkspace: async (input: UpdateWorkspaceInput) => {
+        const target: WorkspaceRow | undefined = workspaces
+            .find((data) => data.id === input.workspaceId);
+        if (!target) {
+            throw new Error("対象のワークスペースが見つかりませんでした。");
+        }
+
+        const newWorkspace: WorkspaceRow =  {
+            ...target,
+            name: input.name,
+            version: target.version + 1,
+            updated_by: input.loginUser,
+            updated_at: getCurrentDate(),
+        };
+
+        workspaces = workspaces
+            .map((row) => row.id === input.workspaceId ? newWorkspace : row);
+
+        return rowToWorkspace(newWorkspace);
+    },
+
+    deleteWorkspace: async (input: DeleteWorkspaceInput) => {
+        const target: WorkspaceRow | undefined = workspaces
+            .find((data) => data.id === input.workspaceId);
+        if (!target) {
+            throw new Error("対象のワークスペースが見つかりませんでした。");
+        }
+
+        const newWorkspace: WorkspaceRow =  {
+            ...target,
+            version: target.version + 1,
+            updated_by: input.loginUser,
+            deleted_at: getCurrentDate(),
+        };
+
+        workspaces = workspaces
+            .map((row) => row.id === input.workspaceId ? newWorkspace : row);
+    },
+} satisfies WorkspaceApi;
+
+// 本番環境とスタブの切り替え点
+// ストアには中身が本番かスタブかを意識させない
+export const workspaceApi = stubWorkspaceApi;
