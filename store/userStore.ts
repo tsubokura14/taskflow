@@ -1,64 +1,57 @@
 import { create } from "zustand";
 import { User } from "@/types";
 import {
-    GetUserInput,
-    CreateUserInput,
-    UpdateUserInput,
+    SignUpInput,
+    SignInInput,
     userApi } from "@/lib/user";
 
 type UserStore = {
     currentUser: User | null;
 
-    // --- DB操作 ---
-    fetchUser: (input: GetUserInput) => Promise<void>;
-    addUser: (input: CreateUserInput) => Promise<void>;
-    editUser: (input: UpdateUserInput) => Promise<void>;
-    removeUser: (id: string) => Promise<void>;
-
-    // --- ログアウト ---
-    logout: () => void;
+    // --- 認証操作 ---
+    initialize: () => Promise<void>;
+    signUp: (input: SignUpInput) => Promise<void>;
+    signIn: (input: SignInInput) => Promise<void>;
+    signOut: () => Promise<void>;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
     currentUser: null,
 
-    // --- DB操作 ---
-    fetchUser: async (input) => {
+    // --- 認証操作 ---
+    initialize: async () => {
         try {
-            const user = await userApi.getUser(input);
+            const user = await userApi.getCurrentUser();
             set({ currentUser: user });
         } catch (error) {
             console.error(error);
         }
     },
 
-    addUser: async (input) => {
+    signUp: async (input) => {
         try {
-            const newUser = await userApi.createUser(input);
-            set({ currentUser: newUser });
+            const user = await userApi.signUp(input);
+            set({ currentUser: user });
         } catch (error) {
             console.error(error);
         }
     },
 
-    editUser: async (input) => {
+    signIn: async (input) => {
         try {
-            const newUser = await userApi.updateUser(input);
-            set((state) => state.currentUser?.id === input.id ? { currentUser: newUser } : {});
+            const user = await userApi.signIn(input);
+            set({ currentUser: user });
         } catch (error) {
             console.error(error);
         }
     },
 
-    removeUser: async (id) => {
+    signOut: async () => {
         try {
-            await userApi.deleteUser(id);
-            set((state) => state.currentUser?.id === id ? { currentUser: null } : {});
+            await userApi.signOut();
+            set({ currentUser: null });
         } catch (error) {
             console.error(error);
         }
     },
-
-    // --- ログアウト ---
-    logout: () => set({ currentUser: null }),
 }));

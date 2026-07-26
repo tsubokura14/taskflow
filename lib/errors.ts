@@ -5,6 +5,13 @@ export class CommonError extends Error {
     }
 }
 
+export class UserDbError extends Error {
+    constructor(cause?: unknown) {
+        super("認証操作でエラーが発生しました。", { cause });
+        this.name = "UserDbError";
+    }
+}
+
 export class WorkspaceDbError extends Error {
     constructor(cause?: unknown) {
         super("DB操作でエラーが発生しました。", { cause });

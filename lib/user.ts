@@ -1,28 +1,22 @@
 import { User } from "@/types";
-import { userFixtures } from "@/lib/user.fixtures";
+import { supabase } from "@/lib/supabaseClient";
+import { UserDbError } from "@/lib/errors";
 
 // --- ports ---
-export type GetUserInput = {
+export type SignUpInput = {
+    email: string;
     password: string;
     name: string;
 }
-export type CreateUserInput = {
+export type SignInInput = {
+    email: string;
     password: string;
-    name: string;
 }
-export type UpdateUserInput = {
+
+/** taskflow.profile から受け取る型 */
+type ProfileRow = {
     id: string;
-    password: string;
     name: string;
-}
-
-
-// DBから受け取る型
-export type UserRow = {
-    id: string,
-    password: string,
-    name: string,
-    deleted_at: string | null
 }
 
 /**
@@ -30,81 +24,79 @@ export type UserRow = {
  * DBとスタブの不整合を防ぐ役割
  */
 export type UserApi = {
-    getUser: (input: GetUserInput) => Promise<User | null>;
-    createUser: (input: CreateUserInput) => Promise<User>;
-    updateUser: (input: UpdateUserInput) => Promise<User>;
-    deleteUser: (id: string) => Promise<void>;
+    signUp: (input: SignUpInput) => Promise<User>;
+    signIn: (input: SignInInput) => Promise<User>;
+    signOut: () => Promise<void>;
+    getCurrentUser: () => Promise<User | null>;
 };
 
-// Mapper
-function rowToUser(row: UserRow): User {
-    return {
-        id: row.id,
-        name: row.name,
-    }
+async function fetchProfile(id: string): Promise<ProfileRow> {
+    const { data, error } = await supabase
+        .from("profile")
+        .select("id, name")
+        .eq("id", id)
+        .single();
+
+    if (error) throw new UserDbError(error);
+    return data as ProfileRow;
 }
 
-// スタブ使用時の暫定的な永続化先（再代入により模擬的にDBの役割を果たす）
-let users: UserRow[] = userFixtures;
-
-// --- スタブ・Adapters ---
-const stubUserApi = {
-    getUser: async (input: GetUserInput) => {
-        const row = users
-            .find((row) => row.name === input.name
-                && row.password === input.password
-                && row.deleted_at === null)
-
-        return row ? rowToUser(row) : null;
-    },
-
-    createUser: async (input: CreateUserInput) => {
-        const newUser: UserRow = {
-            id: crypto.randomUUID(),
-            name: input.name,
+// --- 本番環境・Adapters ---
+const supabaseUserApi = {
+    signUp: async (input: SignUpInput) => {
+        const { data, error } = await supabase.auth.signUp({
+            email: input.email,
             password: input.password,
-            deleted_at: null,
-        }
+            options: { data: { name: input.name } },
+        });
 
-        users = [...users, newUser];
+        if (error) throw new UserDbError(error);
+        if (!data.user) throw new UserDbError();
 
-        return rowToUser(newUser);
+        // taskflow.profile は auth.users への insert トリガー（on_auth_user_created）で自動作成される
+        const profile = await fetchProfile(data.user.id);
+
+        return {
+            id: data.user.id,
+            email: data.user.email ?? "",
+            name: profile.name,
+        };
     },
 
-    updateUser: async (input: UpdateUserInput) => {
-        const target: UserRow | undefined = users
-            .find((row) => row.id === input.id);
-        if (!target) {
-            throw new Error("対象のユーザーが見つかりませんでした。");
-        }
-
-        const newUser: UserRow = {
-            ...target,
-            name: input.name,
+    signIn: async (input: SignInInput) => {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: input.email,
             password: input.password,
+        });
+
+        if (error) throw new UserDbError(error);
+
+        const profile = await fetchProfile(data.user.id);
+
+        return {
+            id: data.user.id,
+            email: data.user.email ?? "",
+            name: profile.name,
         };
-
-        users = users
-            .map((row) => row.id === input.id ? newUser : row);
-
-        return rowToUser(newUser);
     },
 
-    deleteUser: async (id: string) => {
-        const target: UserRow | undefined = users
-            .find((row) => row.id === id);
-        if (!target) {
-            throw new Error("対象のユーザーが見つかりませんでした。");
-        }
+    signOut: async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw new UserDbError(error);
+    },
 
-        const newUser: UserRow = {
-            ...target,
-            deleted_at: new Date().toISOString(),
+    getCurrentUser: async () => {
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data.user) return null;
+
+        const profile = await fetchProfile(data.user.id);
+
+        return {
+            id: data.user.id,
+            email: data.user.email ?? "",
+            name: profile.name,
         };
-
-        users = users
-            .map((row) => row.id === id ? newUser : row);
     },
 } satisfies UserApi;
 
-export const userApi = stubUserApi;
+export const userApi = supabaseUserApi;
