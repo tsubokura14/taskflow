@@ -47,19 +47,19 @@ const supabaseAuthApi = {
         const { data, error } = await supabase.auth.signUp({
             email: input.email,
             password: input.password,
-            options: { data: { name: input.name } },
-        });
+            options: { data: { name: input.name }},
+        })
 
         if (error) throw new UserDbError(error);
         if (!data.user) throw new UserDbError();
 
-        // taskflow.profile は auth.users への insert トリガー（on_auth_user_created）で自動作成される
-        const profile = await fetchProfile(data.user.id);
-
+        // taskflow.profile は auth.users への insert トリガーで自動作成されるが、
+        // メール確認が有効な場合はここでまだセッションが確立されておらず
+        // authenticated専用のprofileをselectできないため、fetchProfileは呼ばずinput.nameをそのまま使う
         return {
             id: data.user.id,
             email: data.user.email ?? "",
-            name: profile.name,
+            name: input.name,
         };
     },
 
