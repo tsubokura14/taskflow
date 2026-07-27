@@ -3,9 +3,9 @@ import { User } from "@/types";
 import {
     SignUpInput,
     SignInInput,
-    userApi } from "@/lib/user";
+    authApi } from "@/lib/auth";
 
-type UserStore = {
+type AuthStore = {
     currentUser: User | null;
 
     // --- 認証操作 ---
@@ -15,13 +15,13 @@ type UserStore = {
     signOut: () => Promise<void>;
 }
 
-export const useUserStore = create<UserStore>((set) => ({
+export const useAuthStore = create<AuthStore>((set) => ({
     currentUser: null,
 
     // --- 認証操作 ---
     initialize: async () => {
         try {
-            const user = await userApi.getCurrentUser();
+            const user = await authApi.getCurrentUser();
             set({ currentUser: user });
         } catch (error) {
             console.error(error);
@@ -30,7 +30,7 @@ export const useUserStore = create<UserStore>((set) => ({
 
     signUp: async (input) => {
         try {
-            const user = await userApi.signUp(input);
+            const user = await authApi.signUp(input);
             set({ currentUser: user });
         } catch (error) {
             console.error(error);
@@ -39,7 +39,7 @@ export const useUserStore = create<UserStore>((set) => ({
 
     signIn: async (input) => {
         try {
-            const user = await userApi.signIn(input);
+            const user = await authApi.signIn(input);
             set({ currentUser: user });
         } catch (error) {
             console.error(error);
@@ -48,7 +48,7 @@ export const useUserStore = create<UserStore>((set) => ({
 
     signOut: async () => {
         try {
-            await userApi.signOut();
+            await authApi.signOut();
             set({ currentUser: null });
         } catch (error) {
             console.error(error);

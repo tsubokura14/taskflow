@@ -3,7 +3,7 @@
 import React, { useState, Dispatch, FormEvent } from "react";
 import { useToastStore } from "@/store/toastStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
-import { useUserStore } from "@/store/userStore";
+import { useAuthStore } from "@/store/authStore";
 import { Workspace } from "@/types";
 import { errorMessages } from "@/lib/errors";
 
@@ -14,7 +14,7 @@ type ChildProps = {
 
 export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildProps) {
     const openToast = useToastStore((state) => state.openToast);
-    const currentUser = useUserStore((state) => state.currentUser);
+    const currentUser = useAuthStore((state) => state.currentUser);
     const addWorkspace = useWorkspaceStore((state) => state.addWorkspace);
     const editWorkspace = useWorkspaceStore((state) => state.editWorkspace);
     const deleteWorkspace = useWorkspaceStore((state) => state.removeWorkspace);

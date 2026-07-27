@@ -23,7 +23,7 @@ type ProfileRow = {
  * ストアとDB/スタブの受け渡しに使用
  * DBとスタブの不整合を防ぐ役割
  */
-export type UserApi = {
+export type AuthApi = {
     signUp: (input: SignUpInput) => Promise<User>;
     signIn: (input: SignInInput) => Promise<User>;
     signOut: () => Promise<void>;
@@ -42,7 +42,7 @@ async function fetchProfile(id: string): Promise<ProfileRow> {
 }
 
 // --- 本番環境・Adapters ---
-const supabaseUserApi = {
+const supabaseAuthApi = {
     signUp: async (input: SignUpInput) => {
         const { data, error } = await supabase.auth.signUp({
             email: input.email,
@@ -97,6 +97,6 @@ const supabaseUserApi = {
             name: profile.name,
         };
     },
-} satisfies UserApi;
+} satisfies AuthApi;
 
-export const userApi = supabaseUserApi;
+export const authApi = supabaseAuthApi;
