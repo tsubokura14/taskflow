@@ -1,3 +1,6 @@
+// サーバーサイドで生成すると、セッション情報がモジュールスコープに
+// 保持され全ユーザー間で共有されてしまうため、クライアント専用とする。
+import "client-only";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -9,6 +12,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
     );
 }
 
+// タブ（＝JSランタイム）単位でモジュールキャッシュが分離されるため、
+// このインスタンスもタブごとに1つだけ生成される。
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     db: { schema: "taskflow" },
 });

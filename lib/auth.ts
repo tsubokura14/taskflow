@@ -64,6 +64,13 @@ const supabaseAuthApi = {
     },
 
     signIn: async (input: SignInInput) => {
+        // 1. 内部でGoTrue（Auth専用サーバー）へ `POST /auth/v1/token?grant_type=password` を送り、
+        //    `auth.users` のパスワードハッシュと照合する。
+        // 2. 認証成功時、GoTrueは `access_token`（JWT。`sub`=`auth.uid()`, `role: "authenticated"`, 有効期限などのクレームを含む）と
+        //    `refresh_token` を返す。
+        // 3. awaitが返るより前に、supabase-js内部でこのセッションをlocalStorageへ永続化し、
+        //    クライアントのメモリ内状態も更新する（自動リフレッシュのタイマー設定もここで行われる）。
+        // 4. その後で初めて `{ data, error }` としてこの関数にPromiseが解決される。
         const { data, error } = await supabase.auth.signInWithPassword({
             email: input.email,
             password: input.password,
