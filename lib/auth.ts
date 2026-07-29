@@ -26,6 +26,7 @@ type ProfileRow = {
 export type AuthApi = {
     signUp: (input: SignUpInput) => Promise<User>;
     signIn: (input: SignInInput) => Promise<User>;
+    signInAsGuest: () => Promise<User>;
     signOut: () => Promise<void>;
     getCurrentUser: () => Promise<User | null>;
 };
@@ -80,6 +81,21 @@ const supabaseAuthApi = {
 
         const profile = await fetchProfile(data.user.id);
 
+        return {
+            id: data.user.id,
+            email: data.user.email ?? "",
+            name: profile.name,
+        };
+    },
+
+    signInAsGuest: async () => {
+        const { data, error } = await supabase.auth.signInAnonymously();
+        if (error) throw new UserDbError(error);
+        if (!data.user) throw new UserDbError(error);
+
+        // トリガーが 'guest-xxxxxxxx' という名前で自動生成したprofileを取得
+        const profile = await fetchProfile(data.user.id)
+        
         return {
             id: data.user.id,
             email: data.user.email ?? "",
