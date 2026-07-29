@@ -12,6 +12,7 @@ type AuthStore = {
     initialize: () => Promise<void>;
     signUp: (input: SignUpInput) => Promise<void>;
     signIn: (input: SignInInput) => Promise<void>;
+    signInAsGuest: () => Promise<void>;
     signOut: () => Promise<void>;
 }
 
@@ -40,6 +41,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
     signIn: async (input) => {
         try {
             const user = await authApi.signIn(input);
+            set({ currentUser: user });
+        } catch (error) {
+            console.error(error);
+        }
+    },
+
+    signInAsGuest: async () => {
+        try {
+            const user = await authApi.signInAsGuest();
             set({ currentUser: user });
         } catch (error) {
             console.error(error);
