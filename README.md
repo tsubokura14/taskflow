@@ -3,7 +3,7 @@
 タスクをカード形式で管理し、ドラッグ＆ドロップでステータス（未着手 / 進行中 / 完了）を切り替えられるカンバンボードアプリです。  
 エンタープライズ利用が可能なレベルのタスク管理SaaSを最終形として想定し、その最初のステップとして構築しています。
 
-**公開URL**: https://tm-taskflow.vercel.app
+**公開URL**: https://taskflow-330233714811.asia-northeast1.run.app
 
 ## 主な機能
 
@@ -19,7 +19,7 @@
 | 状態管理 | Zustand |
 | ドラッグ＆ドロップ | @dnd-kit |
 | データベース / BaaS | Supabase (PostgreSQL) |
-| ホスティング | Vercel（GitHub連携によるCI/CD） |
+| ホスティング | Google Cloud Run（手動デプロイ） |
 
 ## アーキテクチャ
 
