@@ -17,7 +17,7 @@ import { canCreateTask, canEditTask } from "@/lib/permissions"
 import { useToastStore } from "@/store/toastStore";
 import { toastMessages } from "@/lib/messages";
 import { useTaskStore } from "@/store/taskStore";
-import { useUserStore } from "@/store/userStore";
+import { useAuthStore } from "@/store/authStore";
 import { Task, TaskStatus } from "@/types";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskForm } from "@/components/TaskForm";
@@ -134,7 +134,7 @@ export default function KanbanBoard({ params }: Props) {
     const fetchTasks = useTaskStore((state) => state.fetchTasks);
     const editTask = useTaskStore((state) => state.editTask);
     const moveTaskStatus = useTaskStore((state) => state.moveTaskStatus);
-    const currentUser = useUserStore((state) => state.currentUser);
+    const currentUser = useAuthStore((state) => state.currentUser);
 
     // 新規・編集フォーム
     const [ editingTask, setEditingTask ] = useState<Task | null>(null);

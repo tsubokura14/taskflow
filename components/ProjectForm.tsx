@@ -4,7 +4,7 @@ import React, { useState, Dispatch, FormEvent } from "react";
 import { useToastStore } from "@/store/toastStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
 import { useProjectStore } from "@/store/projectStore";
-import { useUserStore } from "@/store/userStore";
+import { useAuthStore } from "@/store/authStore";
 import { Project } from "@/types";
 import { errorMessages } from "@/lib/errors";
 
@@ -15,7 +15,7 @@ type ChildProps = {
 
 export function ProjectForm({ editingProject, setEditingProject }: ChildProps) {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-    const currentUser = useUserStore((state) => state.currentUser);
+    const currentUser = useAuthStore((state) => state.currentUser);
     const openToast = useToastStore((state) => state.openToast);
     const addProject = useProjectStore((state) => state.addProject);
     const editProject = useProjectStore((state) => state.editProject);

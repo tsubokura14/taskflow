@@ -1,5 +1,5 @@
-import { DummyLogin } from "@/components/DummyLogin";
+import { Login } from "@/components/Login";
 
-export default function DummyLoginPage() {
-  return <DummyLogin />;
+export default function LoginPage() {
+  return <Login />;
 }

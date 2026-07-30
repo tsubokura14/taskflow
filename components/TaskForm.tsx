@@ -7,7 +7,7 @@ import { Task } from "@/types";
 import { errorMessages } from "@/lib/errors";
 import { toastMessages } from "@/lib/messages";
 import { useProjectStore } from "@/store/projectStore";
-import { useUserStore } from "@/store/userStore";
+import { useAuthStore } from "@/store/authStore";
 
 type ChildProps = {
     editingTask: Task | null;
@@ -16,7 +16,7 @@ type ChildProps = {
 
 export function TaskForm({ editingTask, setEditingTask }: ChildProps) {
     const openToast = useToastStore((state) => state.openToast);
-    const currentUser = useUserStore((state) => state.currentUser);
+    const currentUser = useAuthStore((state) => state.currentUser);
     const currentProjectId = useProjectStore((state) => state.currentProjectId);
     const fetchTasks = useTaskStore((state) => state.fetchTasks);
     const addTask = useTaskStore((state) => state.addTask);
