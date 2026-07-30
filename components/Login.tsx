@@ -45,14 +45,10 @@ export function Login() {
         }
 
         setIsSubmitting(false);
-
-        if (useAuthStore.getState().currentUser) {
-            router.push("/workspaces")
-        };
     }
  
     return (
-        <div className="flex items-center justify-center h-screen p-8 bg-gray-50">
+        <div className="flex items-center justify-center flex-1 p-8 bg-gray-50">
             <div className="flex flex-col items-center gap-4 rounded-xl border border-gray-200 bg-white p-8 w-72">
                 <h2 className="text-lg font-semibold text-gray-900">ログイン</h2>
                 <form 
@@ -86,7 +82,9 @@ export function Login() {
                         ゲストログイン
                     </button>
                 </form>
-                <TextLink href="/signup">アカウントをお持ちでない方はこちら</TextLink>
+                <TextLink href="/signup">
+                    <span className="text-xs">アカウントをお持ちでない方はこちら</span>
+                </TextLink>
             </div>
         </div>
     )

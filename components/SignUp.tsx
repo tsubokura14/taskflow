@@ -40,7 +40,7 @@ export function SignUp() {
     }
  
     return (
-        <div className="flex items-center justify-center h-screen p-8 bg-gray-50">
+        <div className="flex items-center justify-center flex-1 p-8 bg-gray-50">
             <div className="flex flex-col items-center gap-4 rounded-xl border border-gray-200 bg-white p-8 w-72">
                 <h2 className="text-lg font-semibold text-gray-900">新規登録</h2>
                 <form 
@@ -75,7 +75,9 @@ export function SignUp() {
                         登録する
                     </button>
                 </form>
-                <TextLink href="/">すでにアカウントをお持ちの方はこちら</TextLink>
+                <TextLink href="/">
+                    <span className="text-xs">すでにアカウントをお持ちの方はこちら</span>
+                </TextLink>
             </div>
         </div>
     )

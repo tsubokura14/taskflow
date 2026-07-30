@@ -36,7 +36,7 @@ export default function WorkspacesPage() {
     }, [fetchWorkspaces]);
 
     return (
-        <div className="flex flex-col items-center min-h-screen p-8 bg-gray-50">
+        <div className="flex flex-col items-center flex-1 p-8 bg-gray-50">
             <div className="flex justify-between w-full">
                 {canCreateWorkspace() && (
                     <button
