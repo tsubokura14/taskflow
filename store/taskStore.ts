@@ -3,9 +3,9 @@ import { Task, TaskStatus } from "@/types";
 import { 
     CreateTaskInput,
     UpdateTaskInput,
-    DeleteTaskInput,
-    taskApi 
-} from "@/lib/tasks";
+    DeleteTaskInput
+} from "@/domain/taskApi";
+import { taskApi } from "@/store/composition";
 import { 
     errorMessages,
     CommonError

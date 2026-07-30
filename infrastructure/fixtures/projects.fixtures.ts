@@ -1,4 +1,4 @@
-import { ProjectRow } from "@/lib/projects"
+import { ProjectRow } from "@/infrastructure/supabase/projectAdapter"
 
 /** フィクスチャ */
 export const projectFixtures: ProjectRow[] = [

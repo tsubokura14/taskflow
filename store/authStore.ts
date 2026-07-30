@@ -3,7 +3,8 @@ import { User } from "@/types";
 import {
     SignUpInput,
     SignInInput,
-    authApi } from "@/lib/auth";
+} from "@/domain/authApi";
+import { authApi } from "@/store/composition";
 
 // 未確認・確認中 | 認証済み | 未ログイン（確認済み）
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
