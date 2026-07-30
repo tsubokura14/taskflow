@@ -3,11 +3,14 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { useToastStore } from "@/store/toastStore";
+import { getErrorMessage } from "@/lib/errors";
 
 export function Login() {
     const router = useRouter();
     const signIn = useAuthStore((state) => state.signIn);
     const signInAsGuest = useAuthStore((state) => state.signInAsGuest);
+    const openToast = useToastStore((state) => state.openToast);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [email, setEmail] = useState<string>("");
@@ -17,8 +20,12 @@ export function Login() {
         e.preventDefault();
         setIsSubmitting(true);
 
-        await signIn({ email, password });
-
+        try {
+            await signIn({ email, password });
+        } catch(error) {
+            openToast([{ status: "error", text: getErrorMessage(error) }]);
+        }
+        
         setIsSubmitting(false);
 
         if (useAuthStore.getState().currentUser) {
@@ -29,7 +36,11 @@ export function Login() {
     async function guestLogin() {
         setIsSubmitting(true);
 
-        await signInAsGuest();
+        try {
+            await signInAsGuest();
+        } catch (error) {
+            openToast([{ status: "error", text: getErrorMessage(error) }]);
+        }
 
         setIsSubmitting(false);
 
@@ -58,7 +69,7 @@ export function Login() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full rounded-lg border border-gray-300 bg-white py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="w-full rounded-lg border border-gray-300 bg-blue-600 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
                     >
                         ログイン
                     </button>
@@ -66,7 +77,7 @@ export function Login() {
                         type="button"
                         onClick={guestLogin}
                         disabled={isSubmitting}
-                        className="w-full rounded-lg border border-gray-300 bg-blue-600 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                        className="w-full rounded-lg border border-gray-300 bg-white py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         ゲストログイン
                     </button>

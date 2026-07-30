@@ -8,7 +8,6 @@ import {
 type AuthStore = {
     currentUser: User | null;
 
-    // --- 認証操作 ---
     initialize: () => Promise<void>;
     signUp: (input: SignUpInput) => Promise<void>;
     signIn: (input: SignInInput) => Promise<void>;
@@ -19,7 +18,7 @@ type AuthStore = {
 export const useAuthStore = create<AuthStore>((set) => ({
     currentUser: null,
 
-    // --- 認証操作 ---
+    // 起動時にAuthInitializerから自動実行されるため、失敗してもログのみに留める。
     initialize: async () => {
         try {
             const user = await authApi.getCurrentUser();
@@ -29,39 +28,22 @@ export const useAuthStore = create<AuthStore>((set) => ({
         }
     },
 
+    // 以下はユーザー操作起点。失敗時は例外をそのまま呼び出し元に伝播させ、
+    // 呼び出し元（コンポーネント）でtry/catchしてtoast表示する設計とする
     signUp: async (input) => {
-        try {
-            const user = await authApi.signUp(input);
-            set({ currentUser: user });
-        } catch (error) {
-            console.error(error);
-        }
+        const user = await authApi.signUp(input);
+        set({ currentUser: user });
     },
-
     signIn: async (input) => {
-        try {
-            const user = await authApi.signIn(input);
-            set({ currentUser: user });
-        } catch (error) {
-            console.error(error);
-        }
+        const user = await authApi.signIn(input);
+        set({ currentUser: user });
     },
-
     signInAsGuest: async () => {
-        try {
-            const user = await authApi.signInAsGuest();
-            set({ currentUser: user });
-        } catch (error) {
-            console.error(error);
-        }
+        const user = await authApi.signInAsGuest();
+        set({ currentUser: user });
     },
-
     signOut: async () => {
-        try {
-            await authApi.signOut();
-            set({ currentUser: null });
-        } catch (error) {
-            console.error(error);
-        }
+        await authApi.signOut();
+        set({ currentUser: null });
     },
 }));
