@@ -1,23 +1,14 @@
 import { Workspace } from "@/types"
-import { workspaceFixtures } from "@/lib/workspaces.fixtures"
+import { workspaceFixtures } from "@/infrastructure/fixtures/workspaces.fixtures"
 import { getCurrentDate } from "@/lib/utils"
-import { supabase } from "@/lib/supabaseClient"
+import { supabase } from "@/infrastructure/supabase/supabaseClient"
 import { WorkspaceDbError, WorkspaceNotFoundError } from "@/lib/errors"
-
-// --- ports ---
-export type CreateWorkspaceInput = {
-    name: string;
-    loginUser: string;
-}
-export type UpdateWorkspaceInput = {
-    workspaceId: string;
-    name: string;
-    loginUser: string;
-}
-export type DeleteWorkspaceInput = {
-    workspaceId: string;
-    loginUser: string;
-}
+import { 
+    CreateWorkspaceInput,
+    UpdateWorkspaceInput,
+    DeleteWorkspaceInput,
+    WorkspaceApi
+} from "@/domain/workspaceApi";
 
 // DBから受け取る型
 export type WorkspaceRow = {
@@ -30,17 +21,6 @@ export type WorkspaceRow = {
     updated_at: string,
     deleted_at: string | null
 }
-
-/** 
- * ストアとDB/スタブの受け渡しに使用
- * DBとスタブの不整合を防ぐ役割
- */
-export type WorkspaceApi = {
-    getWorkspaces: (workspaceIds: string[]) => Promise<Workspace[]>;
-    createWorkspace: (input: CreateWorkspaceInput) => Promise<Workspace>;
-    updateWorkspace: (input: UpdateWorkspaceInput) => Promise<Workspace>;
-    deleteWorkspace: (input: DeleteWorkspaceInput) => Promise<void>;
-};
 
 // Mapper
 function rowToWorkspace(row: WorkspaceRow): Workspace {
@@ -56,7 +36,7 @@ function rowToWorkspace(row: WorkspaceRow): Workspace {
 }
 
 // --- 本番環境・Adapters ---
-const supabaseWorkspaceApi = {
+export const supabaseWorkspaceApi = {
     getWorkspaces: async (workspaceIds: string[]) => {
         const { data, error } = await supabase
             .from("workspace")

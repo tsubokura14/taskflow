@@ -1,24 +1,14 @@
 import { Project } from "@/types"
 import { getCurrentDate } from "@/lib/utils";
-import { projectFixtures } from "@/lib/projects.fixtures";
-import { supabase } from './supabaseClient';
+import { projectFixtures } from "@/infrastructure/fixtures/projects.fixtures";
+import { supabase } from '@/infrastructure/supabase/supabaseClient';
 import { ProjectDbError, ProjectNotFoundError } from "@/lib/errors";
-
-// --- ports ---
-export type CreateProjectInput = {
-    workspaceId: string;
-    name: string;
-    loginUser: string;
-}
-export type UpdateProjectInput = {
-    projectId: string;
-    name: string;
-    loginUser: string;
-}
-export type DeleteProjectInput = {
-    projectId: string;
-    loginUser: string;
-}
+import {
+    CreateProjectInput,
+    UpdateProjectInput,
+    DeleteProjectInput,
+    ProjectApi
+} from "@/domain/projectApi";
 
 /** DBから受け取る型 */
 export type ProjectRow = {
@@ -32,17 +22,6 @@ export type ProjectRow = {
     updated_at: string,
     deleted_at: string | null
 }
-
-/** 
- * ストアとDB/スタブの受け渡しに使用
- * DBとスタブの不整合を防ぐ役割
- */
-export type ProjectApi = {
-    getProjects: (workspaceId: string) => Promise<Project[]>;
-    createProject: (input: CreateProjectInput) => Promise<Project>;
-    updateProject: (input: UpdateProjectInput) => Promise<Project>;
-    deleteProject: (input: DeleteProjectInput) => Promise<void>;
-};
 
 // Mapper
 function rowToProject(row: ProjectRow): Project {
@@ -59,7 +38,7 @@ function rowToProject(row: ProjectRow): Project {
 }
 
 // --- 本番環境・Adapters ---
-const supabaseProjectApi = {
+export const supabaseProjectApi = {
     getProjects: async (workspaceId: string) => {
         const { data, error } = await supabase
         .from("project")

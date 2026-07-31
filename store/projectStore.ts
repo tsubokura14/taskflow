@@ -3,8 +3,9 @@ import { Project } from "@/types";
 import { 
     CreateProjectInput,
     UpdateProjectInput,
-    DeleteProjectInput,
-    projectApi } from "@/lib/projects";
+    DeleteProjectInput
+} from "@/domain/projectApi";
+import { projectApi } from "@/store/composition";
 
 type ProjectStore = {
     projects: Project[];

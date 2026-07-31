@@ -3,8 +3,9 @@ import { Workspace } from "@/types";
 import { 
     CreateWorkspaceInput,
     UpdateWorkspaceInput,
-    DeleteWorkspaceInput,
-    workspaceApi } from "@/lib/workspaces";
+    DeleteWorkspaceInput
+} from "@/domain/workspaceApi";
+import { workspaceApi } from "@/store/composition";
 
 type WorkspaceStore = {
     workspaces: Workspace[];

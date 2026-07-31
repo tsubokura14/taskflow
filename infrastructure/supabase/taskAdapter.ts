@@ -1,29 +1,16 @@
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/infrastructure/supabase/supabaseClient";
 import { Task } from "@/types";
 import { 
     TaskDbError,
     TaskConflictError,
     TaskNotFoundError
 } from "@/lib/errors";
-
-// --- ports ---
-export type CreateTaskInput = {
-    projectId: string;
-    title: string;
-    priority: Task["priority"];
-    loginUser: string;
-}
-export type UpdateTaskInput = {
-    id: string;
-    changes: Partial<Pick<Task, "title" | "status" | "priority">>;
-    currentVersion: number;
-    loginUser: string;
-}
-export type DeleteTaskInput = {
-    id: string;
-    currentVersion: number;
-    loginUser: string;
-}
+import {
+    CreateTaskInput,
+    UpdateTaskInput,
+    DeleteTaskInput,
+    TaskApi
+} from "@/domain/taskApi"
 
 /** DBから受け取る型 */
 type TaskRow = {
@@ -39,17 +26,6 @@ type TaskRow = {
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
-};
-
-/** 
- * ストアとDB/スタブの受け渡しに使用
- * DBとスタブの不整合を防ぐ役割
- */
-export type TaskApi = {
-    getTasks: (projectId: string) => Promise<Task[]>;
-    createTask: (input: CreateTaskInput) => Promise<Task>;
-    updateTask: (input: UpdateTaskInput) => Promise<Task>;
-    deleteTask: (input: DeleteTaskInput) => Promise<void>;
 };
 
 // Mapper
@@ -70,7 +46,7 @@ function rowToTask(row: TaskRow): Task {
 }
 
 // --- 本番環境・Adapters ---
-const supabaseTaskApi = {
+export const supabaseTaskApi = {
     getTasks: async (projectId: string) => {
         const { data, error } = await supabase
             .from("task")

@@ -1,4 +1,4 @@
-import { WorkspaceRow } from "@/lib/workspaces"
+import { WorkspaceRow } from "@/infrastructure/supabase/workspaceAdapter"
 
 /** フィクスチャ */
 export const workspaceFixtures: WorkspaceRow[] = [

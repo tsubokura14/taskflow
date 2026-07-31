@@ -1,35 +1,16 @@
-import { User } from "@/types";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/infrastructure/supabase/supabaseClient";
 import { UserDbError } from "@/lib/errors";
-
-// --- ports ---
-export type SignUpInput = {
-    email: string;
-    password: string;
-    name: string;
-}
-export type SignInInput = {
-    email: string;
-    password: string;
-}
+import { 
+    SignUpInput,
+    SignInInput,
+    AuthApi
+} from "@/domain/authApi";
 
 /** taskflow.profile から受け取る型 */
 type ProfileRow = {
     id: string;
     name: string;
 }
-
-/**
- * ストアとDB/スタブの受け渡しに使用
- * DBとスタブの不整合を防ぐ役割
- */
-export type AuthApi = {
-    signUp: (input: SignUpInput) => Promise<User>;
-    signIn: (input: SignInInput) => Promise<User>;
-    signInAsGuest: () => Promise<User>;
-    signOut: () => Promise<void>;
-    getCurrentUser: () => Promise<User | null>;
-};
 
 async function fetchProfile(id: string): Promise<ProfileRow> {
     const { data, error } = await supabase
@@ -43,7 +24,7 @@ async function fetchProfile(id: string): Promise<ProfileRow> {
 }
 
 // --- 本番環境・Adapters ---
-const supabaseAuthApi = {
+export const supabaseAuthApi = {
     signUp: async (input: SignUpInput) => {
         const { data, error } = await supabase.auth.signUp({
             email: input.email,
