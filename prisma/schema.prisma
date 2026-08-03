@@ -1,0 +1,141 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../lib/generated/prisma"
+  previewFeatures = ["multiSchema", "partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["auth", "taskflow"]
+}
+
+/// Supabase Auth（GoTrue）が管理する実テーブル。参照専用として扱う（Prismaからの構造変更は行わない）。
+model User {
+  instanceId               String?   @map("instance_id") @db.Uuid
+  id                       String    @id @db.Uuid
+  aud                      String?   @db.VarChar(255)
+  role                     String?   @db.VarChar(255)
+  email                    String?   @unique(map: "users_email_partial_key", where: raw("(is_sso_user = false)")) @db.VarChar(255)
+  encryptedPassword        String?   @map("encrypted_password") @db.VarChar(255)
+  emailConfirmedAt         DateTime? @map("email_confirmed_at") @db.Timestamptz(6)
+  invitedAt                DateTime? @map("invited_at") @db.Timestamptz(6)
+  confirmationToken        String?   @map("confirmation_token") @unique(map: "confirmation_token_idx", where: raw("((confirmation_token)::text !~ '^[0-9 ]*$'::text)")) @db.VarChar(255)
+  confirmationSentAt       DateTime? @map("confirmation_sent_at") @db.Timestamptz(6)
+  recoveryToken            String?   @map("recovery_token") @unique(map: "recovery_token_idx", where: raw("((recovery_token)::text !~ '^[0-9 ]*$'::text)")) @db.VarChar(255)
+  recoverySentAt           DateTime? @map("recovery_sent_at") @db.Timestamptz(6)
+  emailChangeTokenNew      String?   @map("email_change_token_new") @unique(map: "email_change_token_new_idx", where: raw("((email_change_token_new)::text !~ '^[0-9 ]*$'::text)")) @db.VarChar(255)
+  emailChange              String?   @map("email_change") @db.VarChar(255)
+  emailChangeSentAt        DateTime? @map("email_change_sent_at") @db.Timestamptz(6)
+  lastSignInAt             DateTime? @map("last_sign_in_at") @db.Timestamptz(6)
+  rawAppMetaData           Json?     @map("raw_app_meta_data")
+  rawUserMetaData          Json?     @map("raw_user_meta_data")
+  isSuperAdmin             Boolean?  @map("is_super_admin")
+  createdAt                DateTime? @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime? @map("updated_at") @db.Timestamptz(6)
+  phone                    String?   @unique
+  phoneConfirmedAt         DateTime? @map("phone_confirmed_at") @db.Timestamptz(6)
+  phoneChange              String?   @default("") @map("phone_change")
+  phoneChangeToken         String?   @default("") @map("phone_change_token") @db.VarChar(255)
+  phoneChangeSentAt        DateTime? @map("phone_change_sent_at") @db.Timestamptz(6)
+  confirmedAt              DateTime? @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @map("confirmed_at") @db.Timestamptz(6)
+  emailChangeTokenCurrent  String?   @default("") @map("email_change_token_current") @unique(map: "email_change_token_current_idx", where: raw("((email_change_token_current)::text !~ '^[0-9 ]*$'::text)")) @db.VarChar(255)
+  emailChangeConfirmStatus Int?      @default(0) @map("email_change_confirm_status") @db.SmallInt
+  bannedUntil              DateTime? @map("banned_until") @db.Timestamptz(6)
+  reauthenticationToken    String?   @default("") @map("reauthentication_token") @unique(map: "reauthentication_token_idx", where: raw("((reauthentication_token)::text !~ '^[0-9 ]*$'::text)")) @db.VarChar(255)
+  reauthenticationSentAt   DateTime? @map("reauthentication_sent_at") @db.Timestamptz(6)
+  isSsoUser                Boolean   @default(false) @map("is_sso_user")
+  deletedAt                DateTime? @map("deleted_at") @db.Timestamptz(6)
+  isAnonymous              Boolean   @default(false) @map("is_anonymous")
+
+  profile Profile?
+
+  @@index([createdAt(sort: Desc)], map: "idx_users_created_at_desc")
+  @@index([email], map: "idx_users_email")
+  @@index([lastSignInAt(sort: Desc)], map: "idx_users_last_sign_in_at_desc")
+  @@index([instanceId])
+  @@index([isAnonymous])
+  @@map("users")
+  @@schema("auth")
+}
+
+model Profile {
+  id        String    @id @db.Uuid
+  name      String    @unique(map: "idx_profile_name_active", where: raw("(deleted_at IS NULL)"))
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  createdWorkspaces Workspace[] @relation("WorkspaceCreatedBy")
+  updatedWorkspaces Workspace[] @relation("WorkspaceUpdatedBy")
+  createdProjects   Project[]   @relation("ProjectCreatedBy")
+  updatedProjects   Project[]   @relation("ProjectUpdatedBy")
+  createdTasks      Task[]      @relation("TaskCreatedBy")
+  updatedTasks      Task[]      @relation("TaskUpdatedBy")
+
+  @@map("profile")
+  @@schema("taskflow")
+}
+
+model Workspace {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  version   Int       @default(1)
+  createdBy String    @map("created_by") @db.Uuid
+  updatedBy String    @map("updated_by") @db.Uuid
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  createdByProfile Profile   @relation("WorkspaceCreatedBy", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_workspace_created_by")
+  updatedByProfile Profile   @relation("WorkspaceUpdatedBy", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_workspace_updated_by")
+  projects         Project[]
+
+  @@map("workspace")
+  @@schema("taskflow")
+}
+
+model Project {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspaceId String    @map("workspace_id") @db.Uuid
+  name        String
+  version     Int       @default(1)
+  createdBy   String    @map("created_by") @db.Uuid
+  updatedBy   String    @map("updated_by") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  workspace        Workspace @relation(fields: [workspaceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdByProfile Profile   @relation("ProjectCreatedBy", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_project_created_by")
+  updatedByProfile Profile   @relation("ProjectUpdatedBy", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_project_updated_by")
+  tasks            Task[]
+
+  @@index([workspaceId], map: "idx_project_workspace_id")
+  @@map("project")
+  @@schema("taskflow")
+}
+
+model Task {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId   String    @map("project_id") @db.Uuid
+  title       String
+  status      String
+  priority    String
+  assigneeIds String[]  @default([]) @map("assignee_ids") @db.Uuid
+  createdBy   String    @map("created_by") @db.Uuid
+  updatedBy   String    @map("updated_by") @db.Uuid
+  version     Int       @default(1)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  project          Project @relation(fields: [projectId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_task_project")
+  createdByProfile Profile @relation("TaskCreatedBy", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_task_created_by")
+  updatedByProfile Profile @relation("TaskUpdatedBy", fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_task_updated_by")
+
+  @@index([projectId, createdAt], map: "idx_task_project_active", where: raw("(deleted_at IS NULL)"))
+  @@map("task")
+  @@schema("taskflow")
+}

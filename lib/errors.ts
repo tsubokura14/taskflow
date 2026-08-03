@@ -75,6 +75,13 @@ export class TaskNotFoundError extends Error {
     }
 }
 
+export class UnauthorizedError extends Error {
+    constructor(cause?: unknown) {
+        super("認証が必要です。", { cause });
+        this.name = "UnauthorizedError";
+    }
+}
+
 export const errorMessages = {
     commonError: "エラーが発生しました。",
     workspaceFetchFailed:  "ワークスペースの取得に失敗しました。",

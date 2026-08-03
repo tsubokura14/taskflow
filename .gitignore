@@ -49,3 +49,6 @@ vendor/
 # Editor
 .vscode/
 .idea/
+/lib/generated/prisma
+
+docs

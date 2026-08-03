@@ -3,16 +3,16 @@ import { Workspace } from "@/types"
 // --- ports ---
 export type CreateWorkspaceInput = {
     name: string;
-    loginUser: string;
+    // loginUser: string; TODO
 }
 export type UpdateWorkspaceInput = {
     workspaceId: string;
     name: string;
-    loginUser: string;
+    // loginUser: string; TODO
 }
 export type DeleteWorkspaceInput = {
     workspaceId: string;
-    loginUser: string;
+    // loginUser: string; TODO
 }
 
 /** 
