@@ -13,7 +13,7 @@ import {
     useSensors
 } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { canCreateTask, canEditTask } from "@/lib/permissions"
+import { canCreateTask, canEditTask } from "@/lib/permissions.client"
 import { useToastStore } from "@/store/toastStore";
 import { toastMessages } from "@/lib/messages";
 import { useTaskStore } from "@/store/taskStore";
@@ -246,7 +246,6 @@ export default function KanbanBoard({ params }: Props) {
                     id: activeTask.id,
                     changes: { status: newStatus },
                     currentVersion: activeTask.version,
-                    loginUser: currentUser?.id ?? ""
                 });
   
             // 更新に失敗した場合

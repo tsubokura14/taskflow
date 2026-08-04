@@ -1,3 +1,4 @@
+# Dockerビルドコンテキストとしてビルドする際に、Dockerデーモンへ送信するファイル群から除外するファイルを指定
 node_modules
 .next
 .git

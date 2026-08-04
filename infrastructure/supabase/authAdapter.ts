@@ -1,4 +1,4 @@
-import { supabase } from "@/infrastructure/supabase/supabaseClient";
+import { supabase } from "@/infrastructure/supabase/browserClient";
 import { UserDbError } from "@/lib/errors";
 import { 
     SignUpInput,
@@ -23,27 +23,27 @@ async function fetchProfile(id: string): Promise<ProfileRow> {
     return data as ProfileRow;
 }
 
-// --- 本番環境・Adapters ---
-export const supabaseAuthApi = {
-    signUp: async (input: SignUpInput) => {
-        const { data, error } = await supabase.auth.signUp({
-            email: input.email,
-            password: input.password,
-            options: { data: { name: input.name }},
-        })
+    // --- 本番環境・Adapters ---
+    export const supabaseAuthApi = {
+        signUp: async (input: SignUpInput) => {
+            const { data, error } = await supabase.auth.signUp({
+                email: input.email,
+                password: input.password,
+                options: { data: { name: input.name }},
+            })
 
-        if (error) throw new UserDbError(error);
-        if (!data.user) throw new UserDbError();
+            if (error) throw new UserDbError(error);
+            if (!data.user) throw new UserDbError();
 
-        // taskflow.profile は auth.users への insert トリガーで自動作成されるが、
-        // メール確認が有効な場合はここでまだセッションが確立されておらず
-        // authenticated専用のprofileをselectできないため、fetchProfileは呼ばずinput.nameをそのまま使う
-        return {
-            id: data.user.id,
-            email: data.user.email ?? "",
-            name: input.name,
-        };
-    },
+            // taskflow.profile は auth.users への insert トリガーで自動作成されるが、
+            // メール確認が有効な場合はここでまだセッションが確立されておらず
+            // authenticated専用のprofileをselectできないため、fetchProfileは呼ばずinput.nameをそのまま使う
+            return {
+                id: data.user.id,
+                email: data.user.email ?? "",
+                name: input.name,
+            };
+        },
 
     signIn: async (input: SignInInput) => {
         // 1. 内部でGoTrue（Auth専用サーバー）へ `POST /auth/v1/token?grant_type=password` を送り、

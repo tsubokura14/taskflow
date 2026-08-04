@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import { TextLink } from "@/components/TextLink";
-import { canCreateProject, canEditProject } from "@/lib/permissions";
+import { canCreateProject, canEditProject } from "@/lib/permissions.client";
 import { Project } from "@/types";
 import { useProjectStore } from "@/store/projectStore";
 import { ProjectForm } from "@/components/ProjectForm";

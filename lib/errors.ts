@@ -75,6 +75,30 @@ export class TaskNotFoundError extends Error {
     }
 }
 
+export class UnauthorizedError extends Error {
+    constructor(cause?: unknown) {
+        super("認証が必要です。", { cause });
+        this.name = "UnauthorizedError";
+    }
+}
+
+export class ForbiddenError extends Error {
+    constructor(cause?: unknown) {
+        super("この操作を行う権限がありません。", { cause });
+        this.name = "ForbiddenError";
+    }
+}
+
+// Route Handlerのcatchブロックで、例外の種類をHTTPステータスに変換するための共通関数。
+export function errorToResponseInit(error: unknown): { status: number; message: string } {
+    if (error instanceof UnauthorizedError) return { status: 401, message: error.message };
+    if (error instanceof ForbiddenError) return { status: 403, message: error.message };
+    if (error instanceof TaskNotFoundError) return { status: 404, message: error.message };
+    if (error instanceof TaskConflictError) return { status: 409, message: error.message };
+    if (error instanceof Error) return { status: 500, message: error.message };
+    return { status: 500, message: errorMessages.commonError };
+}
+
 export const errorMessages = {
     commonError: "エラーが発生しました。",
     workspaceFetchFailed:  "ワークスペースの取得に失敗しました。",

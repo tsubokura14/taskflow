@@ -41,7 +41,7 @@ export function TaskForm({ editingTask, setEditingTask }: ChildProps) {
                 projectId: currentProjectId,
                 title,
                 priority,
-                loginUser: currentUser?.id ?? ""});
+            });
         
         // 編集
         } else {
@@ -49,7 +49,6 @@ export function TaskForm({ editingTask, setEditingTask }: ChildProps) {
                 id: task.id,
                 changes: { title, priority },
                 currentVersion: task.version,
-                loginUser: currentUser?.id ?? ""
             });
             
             // 更新に失敗した場合

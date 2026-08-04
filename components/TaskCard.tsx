@@ -5,7 +5,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { Task } from "@/types";
 import { useTaskStore } from "@/store/taskStore";
 import { useAuthStore } from "@/store/authStore";
-import { canEditTask, canDeleteTask } from "@/lib/permissions"
+import { canEditTask, canDeleteTask } from "@/lib/permissions.client"
 
 const priorityLabel: Record<Task["priority"], string> = {
     low: "低",
@@ -50,7 +50,6 @@ export function TaskCard({ task, setEditingTask }: ChildProps) {
             removeTask({
                 id: task.id,
                 currentVersion: task.version,
-                loginUser: currentUser?.id ?? ""
             });
         }
     }

@@ -5,19 +5,19 @@ export type CreateTaskInput = {
     projectId: string;
     title: string;
     priority: Task["priority"];
-    loginUser: string;
-}
+    // loginUser: string; TODO
+} 
 export type UpdateTaskInput = {
     id: string;
     changes: Partial<Pick<Task, "title" | "status" | "priority">>;
     currentVersion: number;
-    loginUser: string;
-}
+    // loginUser: string; TODO
+} 
 export type DeleteTaskInput = {
     id: string;
     currentVersion: number;
-    loginUser: string;
-}
+    // loginUser: string; TODO
+} 
 
 /** 
  * ストアとDB/スタブの受け渡しに使用
