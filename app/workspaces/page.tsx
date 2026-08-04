@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Workspace } from "@/types";
-import { canCreateWorkspace, canEditWorkspace } from "@/lib/permissions";
+import { canCreateWorkspace, canEditWorkspace } from "@/lib/permissions.client";
 import { useWorkspaceStore } from "@/store/workspaceStore";
 import { WorkspaceForm } from "@/components/WorkspaceForm";
 import { TextLink } from "@/components/TextLink";

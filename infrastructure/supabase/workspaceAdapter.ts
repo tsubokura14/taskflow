@@ -1,7 +1,7 @@
 import { Workspace } from "@/types"
 import { workspaceFixtures } from "@/infrastructure/fixtures/workspaces.fixtures"
 import { getCurrentDate } from "@/lib/utils"
-import { supabase } from "@/infrastructure/supabase/supabaseClient"
+import { supabase } from "@/infrastructure/supabase/browserClient"
 import { WorkspaceDbError, WorkspaceNotFoundError } from "@/lib/errors"
 import { 
     CreateWorkspaceInput,

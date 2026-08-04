@@ -4,16 +4,16 @@ import { Project } from "@/types"
 export type CreateProjectInput = {
     workspaceId: string;
     name: string;
-    // loginUser: string; TODO
+    loginUser: string;
 }
 export type UpdateProjectInput = {
     projectId: string;
     name: string;
-    // loginUser: string; TODO
+    loginUser: string;
 }
 export type DeleteProjectInput = {
     projectId: string;
-    // loginUser: string; TODO
+    loginUser: string;
 }
 
 /** 

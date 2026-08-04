@@ -1,4 +1,4 @@
-import { supabase } from "@/infrastructure/supabase/supabaseClient";
+import { supabase } from "@/infrastructure/supabase/browserClient";
 import { UserDbError } from "@/lib/errors";
 import { 
     SignUpInput,

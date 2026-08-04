@@ -1,7 +1,7 @@
 import { Project } from "@/types"
 import { getCurrentDate } from "@/lib/utils";
 import { projectFixtures } from "@/infrastructure/fixtures/projects.fixtures";
-import { supabase } from '@/infrastructure/supabase/supabaseClient';
+import { supabase } from '@/infrastructure/supabase/browserClient';
 import { ProjectDbError, ProjectNotFoundError } from "@/lib/errors";
 import {
     CreateProjectInput,

@@ -8,9 +8,10 @@ import { TaskApi } from "@/domain/taskApi";
 import { supabaseAuthApi } from "@/infrastructure/supabase/authAdapter";
 import { supabaseWorkspaceApi } from "@/infrastructure/supabase/workspaceAdapter";
 import { supabaseProjectApi } from "@/infrastructure/supabase/projectAdapter";
-import { supabaseTaskApi } from "@/infrastructure/supabase/taskAdapter";
+import { apiTaskApi } from "@/infrastructure/api/taskAdapter";
 
 export const authApi: AuthApi = supabaseAuthApi;
 export const workspaceApi: WorkspaceApi = supabaseWorkspaceApi;
 export const projectApi: ProjectApi = supabaseProjectApi;
-export const taskApi: TaskApi = supabaseTaskApi;
+// Taskドメインのみ、Route Handler + Prisma経由の新アーキテクチャに切り替え済み
+export const taskApi: TaskApi = apiTaskApi;
