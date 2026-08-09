@@ -21,6 +21,7 @@ async function throwIfError(res: Response): Promise<void> {
 // --- 本番環境・Adapters（Route Handler経由、Prisma操作はサーバー側） ---
 export const apiTaskApi = {
     getTasks: async (projectId: string) => {
+        // クエリパラメータ（?以降）はルーティングには考慮されない。
         const res = await fetch(`/api/tasks?projectId=${encodeURIComponent(projectId)}`);
         await throwIfError(res);
         return (await res.json()) as Task[];

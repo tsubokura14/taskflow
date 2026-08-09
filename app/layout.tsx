@@ -20,11 +20,8 @@ export const metadata: Metadata = {
   description: "task management app",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout(
+  { children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="ja"
