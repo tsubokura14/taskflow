@@ -26,7 +26,7 @@ export async function resolveWorkspaceRole(
     });
     if (member) return member.role as MemberRole;
 
-    // ゲスト（匿名）ユーザーには、個別のメンバーシップ行がなくても閲覧専用でデモを見せる
+    // ゲスト（匿名）ユーザーには、個別のメンバーシップがなくても閲覧専用でデモを見せる
     const user = await prisma.user.findUnique({
         where: { id: actorId },
         select: { isAnonymous: true },
@@ -34,9 +34,7 @@ export async function resolveWorkspaceRole(
     return user?.isAnonymous ? "viewer" : null;
 }
 
-// project_memberが優先、なければworkspace_memberにフォールバックする。
-// タスク一覧等でN+1にならないよう、呼び出し側は「プロジェクト単位で1回だけ」呼ぶ
-// （タスク1件ごとに呼び出さない）。
+// プロジェクトの権限が存在しない場合、ワークスペース全体の権限を確認する。
 export async function resolveProjectRole(
     actorId: string,
     projectId: string,
