@@ -106,7 +106,7 @@ function KanbanColumn({
     return (
         <div
             ref={setNodeRef}
-            className={`rounded-xl border border-slate-200 p-3 transition-colors ${columnTone[status].bg} ${isOver ? "ring-2 ring-blue-600" : ""}`}
+            className={`rounded-xl border border-slate-200 p-3 transition-colors ${columnTone[status].bg} ${isOver ? "ring-1 ring-slate-200" : ""}`}
         >
             <h2 className={`mb-3 text-sm font-semibold ${columnTone[status].heading}`}>{label}</h2>
 
