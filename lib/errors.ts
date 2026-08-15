@@ -1,3 +1,4 @@
+import { ZodError } from 'zod';
 export class CommonError extends Error {
     constructor(cause?: unknown) {
         super(errorMessages.commonError, { cause });
@@ -93,6 +94,9 @@ export class ForbiddenError extends Error {
 export function errorToResponseInit(error: unknown): { status: number; message: string } {
     if (error instanceof UnauthorizedError) return { status: 401, message: error.message };
     if (error instanceof ForbiddenError) return { status: 403, message: error.message };
+    if (error instanceof ZodError) { 
+        return { status: 400, message: error.issues.map(i => i.message).join(", ") };
+    } 
     if (error instanceof WorkspaceNotFoundError) return { status: 404, message: error.message };
     if (error instanceof WorkspaceConflictError) return { status: 409, message: error.message };
     if (error instanceof ProjectNotFoundError) return { status: 404, message: error.message };
