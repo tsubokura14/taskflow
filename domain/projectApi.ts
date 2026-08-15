@@ -4,16 +4,15 @@ import { Project } from "@/types"
 export type CreateProjectInput = {
     workspaceId: string;
     name: string;
-    loginUser: string;
 }
 export type UpdateProjectInput = {
-    projectId: string;
-    name: string;
-    loginUser: string;
+    id: string;
+    changes: Partial<Pick<Project, "name" >>;
+    currentVersion: number
 }
 export type DeleteProjectInput = {
-    projectId: string;
-    loginUser: string;
+    id: string;
+    currentVersion: number
 }
 
 /** 

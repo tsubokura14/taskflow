@@ -7,13 +7,6 @@ import { useWorkspaceStore } from "@/store/workspaceStore";
 import { WorkspaceForm } from "@/components/WorkspaceForm";
 import { TextLink } from "@/components/TextLink";
 
-// 未実装。ユーザーとワークスペース、権限の中間テーブルから取得するのが正。
-const workspaceIds: string[] = [
-    "11111111-1111-1111-1111-111111111111",
-    "22222222-2222-2222-2222-222222222222",
-    "33333333-3333-3333-3333-333333333333",
-];
-
 export default function WorkspacesPage() {
     const workspaces = useWorkspaceStore((state) => state.workspaces);
     const fetchWorkspaces = useWorkspaceStore((state) => state.fetchWorkspaces);
@@ -32,7 +25,7 @@ export default function WorkspacesPage() {
     };
 
     useEffect(() => {
-        fetchWorkspaces(workspaceIds);
+        fetchWorkspaces();
     }, [fetchWorkspaces]);
 
     return (

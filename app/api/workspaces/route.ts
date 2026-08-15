@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { createWorkspaceSchema } from "@/lib/validation/workspace.schema";
 import { requireAuthenticatedActor } from "@/lib/session";
 import { MemberRole, canCreateWorkspace } from "@/lib/permissions";
 import { ForbiddenError, errorToResponseInit } from "@/lib/errors";
-import { CreateWorkspaceInput } from "@/domain/workspaceApi";
 
 // ワークスペースの一覧を取得
 export async function GET(req: NextRequest) {
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const actor = await requireAuthenticatedActor();
-        const body: CreateWorkspaceInput = await req.json();
+        const body = createWorkspaceSchema.parse(await req.json());
 
         if (!canCreateWorkspace()) {
             throw new ForbiddenError();

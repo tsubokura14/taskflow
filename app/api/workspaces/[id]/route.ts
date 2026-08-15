@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { updateWorkspaceSchema, deleteWorkspaceSchema } from "@/lib/validation/workspace.schema";
 import { requireAuthenticatedActor } from "@/lib/session";
 import { resolveWorkspaceRole, canEditWorkspace, canDeleteWorkspace } from "@/lib/permissions";
 import {
@@ -17,7 +18,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     try {
         const { id } = await params;
         const actor = await requireAuthenticatedActor();
-        const body: Pick<UpdateWorkspaceInput, "name" | "currentVersion" > = await req.json();
+        const body = updateWorkspaceSchema.parse(await req.json());
 
         // 更新対象が存在するか確認
         const existing = await prisma.workspace.findUnique({ where: { id } });
@@ -57,7 +58,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     try {
         const { id } = await params;
         const actor = await requireAuthenticatedActor();
-        const body: Pick<DeleteWorkspaceInput, "currentVersion"> = await req.json();
+        const body = deleteWorkspaceSchema.parse(await req.json());
 
         const existing = await prisma.workspace.findUnique({ where: { id } });
         if (!existing) throw new WorkspaceNotFoundError();

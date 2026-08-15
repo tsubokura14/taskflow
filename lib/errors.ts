@@ -1,4 +1,5 @@
 import { ZodError } from 'zod';
+
 export class CommonError extends Error {
     constructor(cause?: unknown) {
         super(errorMessages.commonError, { cause });

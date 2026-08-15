@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { createTaskSchema } from "@/lib/validation/task.schema"; 
 import { requireAuthenticatedActor } from "@/lib/session";
 import { resolveProjectRole, canCreateTask, canViewTask } from "@/lib/permissions";
 import { ForbiddenError, errorToResponseInit } from "@/lib/errors";
-import { CreateTaskInput } from "@/domain/taskApi";
 
 export async function GET(req: NextRequest) {
     try {
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const actor = await requireAuthenticatedActor();
-        const input: CreateTaskInput = await req.json();
+        const input = createTaskSchema.parse(await req.json());
 
         const role = await resolveProjectRole(actor.id, input.projectId);
         if (!canCreateTask(role)) throw new ForbiddenError();

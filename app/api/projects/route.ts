@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { createProjectSchema } from "@/lib/validation/project.schema";
 import { requireAuthenticatedActor } from "@/lib/session";
 import { resolveWorkspaceRole, canCreateProject, canViewProject } from "@/lib/permissions";
 import { ForbiddenError, errorToResponseInit } from "@/lib/errors";
-import { CreateProjectInput } from "@/domain/projectApi";
 
 // プロジェクトの一覧を取得
 export async function GET(req: NextRequest) {
@@ -36,12 +36,10 @@ export async function GET(req: NextRequest) {
 // プロジェクトを作成
 export async function POST(req: NextRequest) {
     try {
-        const input: CreateProjectInput = await req.json();
-
-        // ユーザー情報を取得
+        const input = createProjectSchema.parse(await req.json());
         const actor = await requireAuthenticatedActor();
 
-        // 作成権限が付与されているか判定
+        // 作成権限の確認
         const role = await resolveWorkspaceRole(actor.id, input.workspaceId);
         if (!canCreateProject(role)) throw new ForbiddenError();
 

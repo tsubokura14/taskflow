@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { updateProjectSchema, deleteProjectSchema } from "@/lib/validation/project.schema";
 import { requireAuthenticatedActor } from "@/lib/session";
 import { resolveWorkspaceRole, canEditProject, canDeleteProject } from "@/lib/permissions";
 import {
@@ -8,7 +9,6 @@ import {
     ProjectNotFoundError,
     errorToResponseInit,
 } from "@/lib/errors";
-import { UpdateProjectInput, DeleteProjectInput } from "@/domain/projectApi";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -17,7 +17,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     try {
         const { id } = await params;
         const actor = await requireAuthenticatedActor();
-        const body: Pick<UpdateProjectInput, "changes" | "currentVersion" > = await req.json();
+        const body = updateProjectSchema.parse(await req.json());
 
         // 更新対象が存在するか確認
         const existing = await prisma.project.findUnique({ where: { id } });
@@ -31,7 +31,11 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
         // updateManyは更新した行数を返却する。
         const result = await prisma.project.updateMany({
             where: { id, version: body.currentVersion },
-            data: { ...body.changes, updatedBy: actor.id, version: { increment: 1 } },
+            data: { 
+                ...body.changes,
+                updatedBy: actor.id,
+                version: { increment: 1 } 
+            },
         });
 
         // エラーを判定
@@ -53,7 +57,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     try {
         const { id } = await params;
         const actor = await requireAuthenticatedActor();
-        const body: Pick<DeleteProjectInput, "currentVersion"> = await req.json();
+        const body = deleteProjectSchema.parse(await req.json());
 
         const existing = await prisma.project.findUnique({ where: { id } });
         if (!existing) throw new ProjectNotFoundError();

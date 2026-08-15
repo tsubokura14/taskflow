@@ -48,7 +48,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
             const newProject = await projectApi.updateProject(input);
             set((state) => ({
                 projects: state.projects
-                    .map((project) => project.id === input.projectId ? newProject : project)
+                    .map((project) => project.id === input.id ? newProject : project)
             }));
         } catch (error) {
             console.error(error);
@@ -60,7 +60,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
             await projectApi.deleteProject(input);
             set((state) => ({
                 projects: state.projects
-                    .filter((project) => project.id !== input.projectId)
+                    .filter((project) => project.id !== input.id)
             }));
         } catch (error) {
             console.error(error);
