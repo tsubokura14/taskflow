@@ -5,18 +5,15 @@ export type CreateTaskInput = {
     projectId: string;
     title: string;
     priority: Task["priority"];
-    // loginUser: string; TODO
 } 
 export type UpdateTaskInput = {
     id: string;
     changes: Partial<Pick<Task, "title" | "status" | "priority">>;
     currentVersion: number;
-    // loginUser: string; TODO
 } 
 export type DeleteTaskInput = {
     id: string;
     currentVersion: number;
-    // loginUser: string; TODO
 } 
 
 /** 

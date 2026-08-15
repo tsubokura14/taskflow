@@ -33,15 +33,13 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
 
         // 新規作成
         if (workspace.id === "") {
-            await addWorkspace({
-                name,
-                loginUser: currentUser?.id ?? ""});
+            await addWorkspace({ name });
         // 編集
         } else {
             await editWorkspace({
-                workspaceId: workspace.id,
+                id: workspace.id,
                 name,
-                loginUser: currentUser?.id ?? ""
+                currentVersion: workspace.version, 
             });
         }
         setEditingWorkspace(null);
@@ -49,8 +47,8 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
 
     async function handleDelete() {
         await deleteWorkspace({
-            workspaceId: workspace.id,
-            loginUser: currentUser?.id ?? ""
+            id: workspace.id,
+            currentVersion: workspace.version, 
         });
         setEditingWorkspace(null);
     }

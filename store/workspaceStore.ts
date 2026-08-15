@@ -11,7 +11,7 @@ type WorkspaceStore = {
     workspaces: Workspace[];
 
     // --- DB操作 ---
-    fetchWorkspaces: (workspaceIds: string[]) => Promise<void>
+    fetchWorkspaces: () => Promise<void>
     addWorkspace: (input: CreateWorkspaceInput) => Promise<void>;
     editWorkspace: (input: UpdateWorkspaceInput) => Promise<void>;
     removeWorkspace: (input: DeleteWorkspaceInput) => Promise<void>;
@@ -25,9 +25,9 @@ export const useWorkspaceStore = create<WorkspaceStore>((set) => ({
     workspaces: [],
 
     // --- DB操作 ---
-    fetchWorkspaces: async (workspaceIds) => {
+    fetchWorkspaces: async () => {
         try {
-            const workspaces = await workspaceApi.getWorkspaces(workspaceIds);
+            const workspaces = await workspaceApi.getWorkspaces();
             set({ workspaces });
         } catch (error) {
             console.error(error);
@@ -48,7 +48,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set) => ({
             const newWorkspace = await workspaceApi.updateWorkspace(input);
             set((state) => ({
                 workspaces: state.workspaces
-                    .map((workspace) => workspace.id === input.workspaceId ? newWorkspace : workspace)
+                    .map((workspace) => workspace.id === input.id ? newWorkspace : workspace)
             }));
         } catch (error) {
             console.error(error);
@@ -60,7 +60,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set) => ({
             await workspaceApi.deleteWorkspace(input);
             set((state) => ({
                 workspaces: state.workspaces
-                    .filter((workspace) => workspace.id !== input.workspaceId)
+                    .filter((workspace) => workspace.id !== input.id)
             }));
         } catch (error) {
             console.error(error);

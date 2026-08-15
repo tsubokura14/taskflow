@@ -38,22 +38,22 @@ export function ProjectForm({ editingProject, setEditingProject }: ChildProps) {
             await addProject({
                 workspaceId: currentWorkspaceId,
                 name,
-                loginUser: currentUser?.id ?? ""});
+            });
         // 編集
         } else {
             await editProject({
-                projectId: project.id,
-                name,
-                loginUser: currentUser?.id ?? ""
+                id: project.id,
+                changes: { name },
+                currentVersion: project.version,
             });
         }
         setEditingProject(null);
     }
 
     async function handleDelete() {
-        await deleteProject({
-            projectId: project.id,
-            loginUser: currentUser?.id ?? ""
+        await deleteProject({ 
+            id: project.id,
+            currentVersion: project.version,
         });
         setEditingProject(null);
     }
