@@ -35,12 +35,12 @@ export default function ProjectsPage({ params }: Props) {
     }, [fetchProjects, workspaceId]);
 
     return (
-        <div className="flex flex-col items-center flex-1 p-8 bg-gray-50">
+        <div className="flex flex-col items-center flex-1 p-8 bg-slate-50">
             <div className="flex justify-between w-full">
                 {canCreateProject() && (
                     <button
                         onClick={() => setEditingProject(newProject)}
-                        className="mb-4 w-24 border border-gray-300 rounded-lg py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                        className="mb-4 w-24 border border-slate-300 rounded-lg py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                     >
                         作成
                     </button>
@@ -48,7 +48,7 @@ export default function ProjectsPage({ params }: Props) {
             </div>
             <div className="grid grid-cols-3 gap-2 w-full">
                 {projects.map((project) => (
-                    <div key={project.id} className="flex justify-between w-full border border-gray-200 rounded-xl p-4 bg-white">
+                    <div key={project.id} className="flex justify-between w-full border border-slate-200 rounded-xl p-4 bg-white">
                         <TextLink href={`/workspaces/${project.workspaceId}/projects/${project.id}/boards`}>
                             <button>{project.name}</button>
                         </TextLink>

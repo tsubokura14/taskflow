@@ -29,12 +29,12 @@ export default function WorkspacesPage() {
     }, [fetchWorkspaces]);
 
     return (
-        <div className="flex flex-col items-center flex-1 p-8 bg-gray-50">
+        <div className="flex flex-col items-center flex-1 p-8 bg-slate-50">
             <div className="flex justify-between w-full">
                 {canCreateWorkspace() && (
                     <button
                         onClick={() => setEditingWorkspace(newWorkspace)}
-                        className="mb-4 w-24 border border-gray-300 rounded-lg py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                        className="mb-4 w-24 border border-slate-300 rounded-lg py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
                     >
                         作成
                     </button>
@@ -42,7 +42,7 @@ export default function WorkspacesPage() {
             </div>
             <div className="grid grid-cols-3 gap-2 w-full">
                 {workspaces.map((workspace) => (
-                    <div key={workspace.id} className="flex justify-between w-full border border-gray-200 rounded-xl p-4 bg-white">
+                    <div key={workspace.id} className="flex justify-between w-full border border-slate-200 rounded-xl p-4 bg-white">
                         <TextLink href={`/workspaces/${workspace.id}/projects`}>
                             <button>{workspace.name}</button>
                         </TextLink>

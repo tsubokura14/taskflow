@@ -30,9 +30,9 @@ const columns: { status: TaskStatus; label: string }[] = [
 ];
 
 const columnTone: Record<TaskStatus, { bg: string; heading: string }> = {
-    todo: { bg: "bg-slate-50", heading: "text-slate-600" },
-    in_progress: { bg: "bg-blue-50", heading: "text-blue-700" },
-    done: { bg: "bg-green-50", heading: "text-green-700" },
+    todo: { bg: "bg-slate-100/70", heading: "text-slate-600" },
+    in_progress: { bg: "bg-slate-100/70", heading: "text-slate-600" },
+    done: { bg: "bg-slate-100/70", heading: "text-slate-600" },
 };
 
 /**
@@ -113,7 +113,7 @@ function KanbanColumn({
             {/* SortableContext: idリストの並び替え文脈を子に供給するもの */}
             {/* strategy: ドラッグしている要素が他の要素を押しのけるときの並び替えアルゴリズム */}
             <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
-                <div className="flex min-h-10 flex-col gap-2">
+                <div className="flex min-h-24 flex-col gap-2">
                     {tasks.map((task) => (
                         <TaskCard key={task.id} task={task} setEditingTask={setEditingTask} />
                     ))}
@@ -280,7 +280,7 @@ export default function KanbanBoard({ params }: Props) {
             {/* onDragOver: ドラッグ中に重なっているドロップ可能領域が切り替わるたびに呼びだす */}
             {/* onDragEnd: ドロップしたときに呼び出す */}
             <DndContext sensors={sensors} modifiers={modifiers} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
-                <div ref={gridRef} className="grid grid-cols-3 gap-5">
+                <div ref={gridRef} className="grid grid-cols-3 gap-5 items-start">
                     {columns.map((column) => (
                         <KanbanColumn
                             key={column.status}
