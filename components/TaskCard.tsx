@@ -54,7 +54,10 @@ export function TaskCard({ task, setEditingTask }: ChildProps) {
                 担当： {task.assigneeIds[0] ?? "未割当"}
             </span>
             <div className="flex items-center justify-between gap-1 text-xs text-slate-500">
-                <span className={`font-semibold ${priorityTone[task.priority]}`}>優先度： {priorityLabel[task.priority]}</span>
+                <div className="font-semibold">
+                    優先度： 
+                    <span className={`${priorityTone[task.priority]}`}>{priorityLabel[task.priority]}</span>
+                </div>
                 <div className="flex justify-end gap-2 text-xs">
                     {canEditTask() && (
                         <button 

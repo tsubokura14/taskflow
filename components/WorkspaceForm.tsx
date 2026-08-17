@@ -57,7 +57,7 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
         <div className="fixed inset-0 flex items-center justify-center bg-slate-900/40">
             <form
                 onSubmit={handleSubmit}
-                className="grid gap-4 w-96 rounded-2xl bg-white p-6 shadow-xl"
+                className="grid gap-8 w-96 rounded-2xl bg-white p-6 shadow-xl"
             >
                 <h2 className="text-base font-bold text-slate-900">
                     {workspace.id === "" ? "ワークスペースを作成" : "ワークスペースを編集"}
