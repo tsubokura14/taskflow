@@ -48,16 +48,22 @@ export default function ProjectsPage({ params }: Props) {
             </div>
             <div className="grid grid-cols-3 gap-2 w-full">
                 {projects.map((project) => (
-                    <div 
-                        key={project.id} 
-                        className="flex justify-between w-full border border-slate-200 rounded-xl p-4 bg-white"
+                    <div
+                        key={project.id}
+                        className="group relative flex justify-between w-full border border-slate-200 rounded-xl p-4 bg-white hover:border-slate-300"
                     >
-                        <TextLink href={`/workspaces/${project.workspaceId}/projects/${project.id}/boards`}>
-                            <button>{project.name}</button>
+                        <TextLink
+                            href={`/workspaces/${project.workspaceId}/projects/${project.id}/boards`}
+                            className="text-slate-900 transition-colors group-hover:text-blue-700 after:absolute after:inset-0 group-has-[[data-independent]:hover]:text-slate-700!"
+                        >
+                            {project.name}
                         </TextLink>
                         {canEditProject() && (
                             <button
+                                type="button"
+                                data-independent
                                 onClick={() => setEditingProject(project)}
+                                className="relative z-10"
                             >
                                 設定
                             </button>
