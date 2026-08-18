@@ -9,7 +9,7 @@
 
 - タスクの作成・編集・削除
 - ドラッグ＆ドロップによるステータス変更（`@dnd-kit`）
-- PostgreSQL（Supabase管理）によるデータ永続化。Taskドメインは Prisma 経由、それ以外は Supabaseクライアント経由
+- PostgreSQL（Supabase管理）によるデータ永続化。
 
 ## 技術スタック
 
@@ -17,6 +17,8 @@
 | --- | --- |
 | フロントエンド | Next.js 16 (App Router) / React 19 / TypeScript |
 | 状態管理 | Zustand |
+| ORM | prisma |
+| バリデーション | zod |
 | データベース | PostgreSQL (Supabase管理) |
 | 認証 | Supabase Auth |
 | ホスティング | Google Cloud Run（手動デプロイ） |
@@ -27,12 +29,11 @@ UIコンポーネントからDBアクセスの実装を直接呼ばず、Port（
 
 ```mermaid
 flowchart TD
-    UI["UI (KanbanBoard, TaskForm)"] --> STORE["状態管理 (Zustand store)"]
-    STORE --> PORT["domain/ の Port型（TaskApi等）"]
-    PORT -->|Task| TASKADAPTER["infrastructure/api/taskAdapter.ts"] --> ROUTE["Route Handler + Prisma"]
-    PORT -->|Workspace/Project/Auth| SUPADAPTER["infrastructure/supabase/*Adapter.ts"] --> SUPABASEJS["supabase-js"]
+    UI["UI (KanbanBoard, TaskForm, ProjectForm, WorkspaceForm)"] --> STORE["状態管理 (Zustand store)"]
+    STORE --> PORT["domain/ の Port型（Workspace/Project/TaskApi等）"]
+    PORT -->|Workspace/Project/Task| APIADAPTER["infrastructure/api/*Adapter.ts"] --> ROUTE["Route Handler（zodバリデーション） + Prisma"]
+    PORT -->|Auth| AUTHADAPTER["infrastructure/supabase/authAdapter.ts"] --> SUPABASEAUTH["Supabase Auth（本人確認のみ）"]
     ROUTE --> PG[("PostgreSQL (Supabase管理)")]
-    SUPABASEJS --> PG
 ```
 
 ## ディレクトリ構成
@@ -44,5 +45,6 @@ flowchart TD
 | domain/ | Port（Task/Workspace/Project/AuthApiの型定義） |
 | infrastructure/ | Adapter（Supabaseクライアント、TaskのPrisma経由Adapter） |
 | store/ | Zustandによる状態管理・composition.ts |
-| lib/ | Prismaクライアント・セッション検証・権限チェック |
+| lib/ | Prismaクライアント・セッション検証・権限チェック・エラーハンドリング |
+| lib/validation/ | zodによるRoute Handler向けバリデーションスキーマ |
 | types/ | 型定義 |

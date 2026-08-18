@@ -3,9 +3,7 @@
 import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
 import { Task } from "@/types";
-import { useTaskStore } from "@/store/taskStore";
-import { useAuthStore } from "@/store/authStore";
-import { canEditTask, canDeleteTask } from "@/lib/permissions.client"
+import { canEditTask } from "@/lib/permissions.client"
 
 const priorityLabel: Record<Task["priority"], string> = {
     low: "低",
@@ -25,8 +23,6 @@ type ChildProps = {
 };
 
 export function TaskCard({ task, setEditingTask }: ChildProps) {
-    const removeTask = useTaskStore((state) => state.removeTask);
-    const currentUser = useAuthStore((state) => state.currentUser);
 
     // attributes: role・aria-roledescription・aria-disabled・tabIndex などのアクセシビリティ用属性一式
     // listeners: ドラッグ開始を検知するイベントハンドラ一式
@@ -45,49 +41,35 @@ export function TaskCard({ task, setEditingTask }: ChildProps) {
         opacity: isDragging ? 0.5 : 1,
     };
 
-    function handleDelete() {
-        if (window.confirm(`「${task.title}」を削除しますか？`)) {
-            removeTask({
-                id: task.id,
-                currentVersion: task.version,
-            });
-        }
-    }
-
     return (
         <div
             ref={setNodeRef}
             style={style}
             {...attributes}
             {...listeners} 
-            className="touch-none rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
+            className="touch-none rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition-shadow duration-1000 hover:shadow-md hover:duration-1000"
         >
-            <p className="text-sm font-semibold text-slate-900 leading-snug">{task.title}</p>
-            <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
-                <span>担当： {task.assigneeIds[0] ?? "未割当"}</span>
-                <span className={`font-semibold ${priorityTone[task.priority]}`}>優先度： {priorityLabel[task.priority]}</span>
-            </div>
-            <div className="mt-2 flex justify-end gap-2 text-xs">
-                {canEditTask() && (
-                    <button 
-                        // ボタンが押下されることで、ドラッグ開始として親に伝播することを阻止する
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={() => setEditingTask(task)}
-                        className="text-blue-600 hover:underline"
-                    >
-                        編集
-                    </button>
-                )}
-                {canDeleteTask() && (
-                    <button 
-                        // ボタンが押下されることで、ドラッグ開始として親に伝播することを阻止する
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={handleDelete}
-                        className="text-red-600 hover:underline"
-                    >
-                        削除
-                    </button>
-                )}
+            <p className="mb-2 text-sm font-semibold text-slate-900 leading-snug">{task.title}</p>
+            <span className="font-semibold text-xs text-slate-500">
+                担当： {task.assigneeIds[0] ?? "未割当"}
+            </span>
+            <div className="flex items-center justify-between gap-1 text-xs text-slate-500">
+                <div className="font-semibold">
+                    優先度： 
+                    <span className={`${priorityTone[task.priority]}`}>{priorityLabel[task.priority]}</span>
+                </div>
+                <div className="flex justify-end gap-2 text-xs">
+                    {canEditTask() && (
+                        <button 
+                            // ボタンが押下されることで、ドラッグ開始として親に伝播することを阻止する
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onClick={() => setEditingTask(task)}
+                            className="text-blue-600 hover:underline"
+                        >
+                            編集
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

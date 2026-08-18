@@ -20,10 +20,10 @@ export function Header() {
  
     return (
         <header
-         className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 px-4 py-3 bg-white/90 backdrop-blur-sm"
+         className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 px-4 py-3 bg-white/90 backdrop-blur-sm"
         >
             <TextLink href={authStatus === "authenticated" ? "/workspaces" : "/" }>
-                <span className="text-base font-semibold tracking-tight text-gray-900">
+                <span className="text-base font-semibold tracking-tight text-slate-900">
                     TaskFlow
                 </span>
             </TextLink>
@@ -31,7 +31,7 @@ export function Header() {
             {authStatus === "authenticated" &&
                 <button
                     onClick={handleSignOut}
-                    className="rounded-lg px-3 py-1.5 text-sm font-midium text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
+                    className="rounded-lg px-3 py-1.5 text-sm font-midium text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900"
                 >
                     サインアウト
                 </button>

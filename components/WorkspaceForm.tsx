@@ -57,13 +57,13 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
         <div className="fixed inset-0 flex items-center justify-center bg-slate-900/40">
             <form
                 onSubmit={handleSubmit}
-                className="w-96 rounded-2xl bg-white p-6 shadow-xl"
+                className="grid gap-8 w-96 rounded-2xl bg-white p-6 shadow-xl"
             >
-                <h2 className="mb-4 text-base font-bold text-slate-900">
+                <h2 className="text-base font-bold text-slate-900">
                     {workspace.id === "" ? "ワークスペースを作成" : "ワークスペースを編集"}
                 </h2>
 
-                <label className="mb-3 block text-xs font-semibold text-slate-500">
+                <label className="block text-xs font-semibold text-slate-500">
                     名称
                     <input
                         type="text"
@@ -73,33 +73,37 @@ export function WorkspaceForm({ editingWorkspace, setEditingWorkspace }: ChildPr
                     />
                 </label>
 
-                <div className="flex justify-end gap-2 mb-3">
-                    <button
-                        type="button"
-                        onClick={() => setEditingWorkspace(null)}
-                        className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 transition hover:bg-slate-50"
-                    >
-                        キャンセル
-                    </button>
-                    <button
-                        type="submit"
-                        className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-600/90"
-                    >
-                        保存
-                    </button>
-                </div>
-
-                {workspace.id !== "" && (
-                    <div className="flex justify-end">
+                <div className="flex flex-row-reverse justify-between" >
+                    <div className="flex justify-end gap-2 mb-3">
                         <button
                             type="button"
-                            onClick={() => handleDelete()}
-                            className="rounded-lg bg-red-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-600/90"
+                            onClick={() => setEditingWorkspace(null)}
+                            className="rounded-lg border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
                         >
-                            削除
+                            キャンセル
+                        </button>
+                        <button
+                            type="submit"
+                            className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+                        >
+                            保存
                         </button>
                     </div>
-                )}
+
+                    <div>
+                        {workspace.id !== "" && (
+                            <div className="flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => handleDelete()}
+                                    className="rounded-lg bg-red-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
+                                >
+                                    削除
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </form>
         </div>
     );
