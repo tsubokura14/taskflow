@@ -4,6 +4,7 @@ import { createTaskSchema } from "@/lib/validation/task.schema";
 import { requireAuthenticatedActor } from "@/lib/session";
 import { resolveProjectRole, canCreateTask, canViewTask } from "@/lib/permissions";
 import { ForbiddenError, errorToResponseInit } from "@/lib/errors";
+import { attachAssignees } from "@/lib/assignees";
 
 export async function GET(req: NextRequest) {
     try {
@@ -16,11 +17,9 @@ export async function GET(req: NextRequest) {
         const role = await resolveProjectRole(actor.id, projectId);
         if (!canViewTask(role)) throw new ForbiddenError();
 
-        const tasks = await prisma.task.findMany({
-            where: { projectId, deletedAt: null },
-            orderBy: { createdAt: "asc" },
-        });
-        return NextResponse.json(tasks);
+        const tasks = await prisma.task.findMany({ where: { projectId, deletedAt: null }, orderBy: { createdAt: "asc" } });
+        return NextResponse.json(await attachAssignees(tasks));
+
     } catch (error) {
         const { status, message } = errorToResponseInit(error);
         return NextResponse.json({ error: message }, { status });

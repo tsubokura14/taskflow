@@ -34,7 +34,7 @@ export type Task = {
     title: string;
     status: TaskStatus;
     priority: TaskPriority;
-    assigneeIds: string[]; // タスクの担当者
+    assignees: { id: string; name: string }[];
     createdBy: string;
     updatedBy: string;
     version: number;

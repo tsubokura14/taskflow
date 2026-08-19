@@ -51,7 +51,7 @@ export function TaskCard({ task, setEditingTask }: ChildProps) {
         >
             <p className="mb-2 text-sm font-semibold text-slate-900 leading-snug">{task.title}</p>
             <span className="font-semibold text-xs text-slate-500">
-                担当： {task.assigneeIds[0] ?? "未割当"}
+                担当： {task.assignees.length > 0 ? task.assignees.map((a) => a.name).join("、") : "未割当"}
             </span>
             <div className="flex items-center justify-between gap-1 text-xs text-slate-500">
                 <div className="font-semibold">
