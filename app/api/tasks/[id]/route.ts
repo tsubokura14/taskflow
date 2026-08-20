@@ -9,7 +9,7 @@ import {
     TaskNotFoundError,
     errorToResponseInit,
 } from "@/lib/errors";
-import { UpdateTaskInput, DeleteTaskInput } from "@/domain/taskApi";
+import { attachAssignees } from "@/lib/assignees";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -42,7 +42,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
         // 更新を行った行を返却
         const updated = await prisma.task.findUniqueOrThrow({ where: { id } });
-        return NextResponse.json(updated);
+        const [withAssignees] = await attachAssignees([updated]);
+        return NextResponse.json(withAssignees);
     } catch (error) {
         const { status, message } = errorToResponseInit(error);
         return NextResponse.json({ error: message }, { status });

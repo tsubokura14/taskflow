@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
                 updatedBy: actor.id,
             },
         });
-        return NextResponse.json(task);
+        const [withAssignees] = await attachAssignees([task]);
+        return NextResponse.json(withAssignees);
     } catch (error) {
         const { status, message } = errorToResponseInit(error);
         return NextResponse.json({ error: message }, { status });
