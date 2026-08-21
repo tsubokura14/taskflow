@@ -145,7 +145,7 @@ export default function KanbanBoard({ params }: Props) {
         title: "",
         status: "todo",
         priority: "low",
-        assigneeIds: [],
+        assignees: [],
         createdBy: currentUser?.id ?? "",
         updatedBy: currentUser?.id ?? "",
         version: 1,
